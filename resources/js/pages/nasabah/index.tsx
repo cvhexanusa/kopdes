@@ -1,4 +1,4 @@
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, useForm, router, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -55,7 +55,6 @@ interface Props {
 }
 
 export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
-    const [isViewOpen, setIsViewOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [selectedNasabah, setSelectedNasabah] = useState<Nasabah | null>(null);
@@ -157,12 +156,11 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                                                 <Button
                                                     variant="outline"
                                                     size="icon"
-                                                    onClick={() => {
-                                                        setSelectedNasabah(n);
-                                                        setIsViewOpen(true);
-                                                    }}
+                                                    asChild
                                                 >
-                                                    <Eye className="h-4 w-4" />
+                                                    <Link href={`/nasabah/${n.nasabah_id}`}>
+                                                        <Eye className="h-4 w-4" />
+                                                    </Link>
                                                 </Button>
                                                 <Button
                                                     variant="outline"
@@ -203,87 +201,6 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                     </table>
                 </div>
                 <Pagination links={nasabahs.links} />
-
-                {/* View Dialog */}
-                <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
-                    <DialogContent className="sm:max-w-[600px]">
-                        <DialogHeader>
-                            <DialogTitle>Detail Nasabah</DialogTitle>
-                        </DialogHeader>
-                        {selectedNasabah && (
-                            <div className="grid grid-cols-2 gap-4 py-4">
-                                <div className="space-y-1">
-                                    <Label className="text-muted-foreground">Nama Lengkap</Label>
-                                    <p className="font-medium">{selectedNasabah.nama}</p>
-                                </div>
-                                <div className="space-y-1">
-                                    <Label className="text-muted-foreground">NIK</Label>
-                                    <p className="font-medium">{selectedNasabah.nik}</p>
-                                </div>
-                                <div className="space-y-1">
-                                    <Label className="text-muted-foreground">Tempat, Tanggal Lahir</Label>
-                                    <p className="font-medium">{selectedNasabah.tempat_lahir}, {selectedNasabah.tanggal_lahir}</p>
-                                </div>
-                                <div className="space-y-1">
-                                    <Label className="text-muted-foreground">No. Handphone</Label>
-                                    <p className="font-medium">{selectedNasabah.no_handphone}</p>
-                                </div>
-                                <div className="col-span-2 space-y-1">
-                                    <Label className="text-muted-foreground">Domisili</Label>
-                                    <p className="font-medium">{selectedNasabah.domisili}</p>
-                                </div>
-                                <div className="space-y-1">
-                                    <Label className="text-muted-foreground">Pekerjaan</Label>
-                                    <p className="font-medium">{selectedNasabah.pekerjaan}</p>
-                                </div>
-                                <div className="space-y-1">
-                                    <Label className="text-muted-foreground">Instansi</Label>
-                                    <p className="font-medium">{selectedNasabah.instansi?.nama || '-'}</p>
-                                </div>
-
-                                <div className="col-span-2 grid grid-cols-2 gap-4 mt-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-muted-foreground">Foto KTP</Label>
-                                        {selectedNasabah.foto_ktp ? (
-                                            <div className="border rounded-md overflow-hidden bg-muted aspect-[3/2] flex items-center justify-center">
-                                                <img 
-                                                    src={`https://drive.google.com/thumbnail?id=${selectedNasabah.foto_ktp}&sz=w500`} 
-                                                    alt="KTP" 
-                                                    className="w-full h-full object-cover cursor-pointer"
-                                                    onClick={() => window.open(`https://drive.google.com/uc?id=${selectedNasabah.foto_ktp}`, '_blank')}
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div className="border rounded-md bg-muted aspect-[3/2] flex items-center justify-center text-xs text-muted-foreground italic">
-                                                Tidak ada foto
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-muted-foreground">Foto KK</Label>
-                                        {selectedNasabah.foto_kk ? (
-                                            <div className="border rounded-md overflow-hidden bg-muted aspect-[3/2] flex items-center justify-center">
-                                                <img 
-                                                    src={`https://drive.google.com/thumbnail?id=${selectedNasabah.foto_kk}&sz=w500`} 
-                                                    alt="KK" 
-                                                    className="w-full h-full object-cover cursor-pointer"
-                                                    onClick={() => window.open(`https://drive.google.com/uc?id=${selectedNasabah.foto_kk}`, '_blank')}
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div className="border rounded-md bg-muted aspect-[3/2] flex items-center justify-center text-xs text-muted-foreground italic">
-                                                Tidak ada foto
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                        <DialogFooter>
-                            <Button onClick={() => setIsViewOpen(false)}>Tutup</Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
 
                 {/* Edit Dialog */}
                 <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>

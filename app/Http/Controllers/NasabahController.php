@@ -41,7 +41,9 @@ class NasabahController extends Controller
     public function show($id)
     {
         $nasabah = Nasabah::with('instansi')->findOrFail($id);
-        return response()->json($nasabah);
+        return Inertia::render('nasabah/show', [
+            'nasabah' => $nasabah
+        ]);
     }
 
     /**
