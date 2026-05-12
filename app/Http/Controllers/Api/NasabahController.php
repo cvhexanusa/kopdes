@@ -15,11 +15,16 @@ class NasabahController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info('Google Form Data Request:', $request->all());
+        $receivedToken = $request->header('X-Google-Form-Token');
+        $expectedToken = env('GOOGLE_FORM_TOKEN');
+
+        Log::info('Google Form Debug:', [
+            'received_token' => $receivedToken,
+            'expected_token' => $expectedToken,
+            'all_headers' => $request->headers->all(),
+        ]);
         
-        $token = $request->header('X-Google-Form-Token');
-        
-        if (!$token || $token !== env('GOOGLE_FORM_TOKEN')) {
+        if (!$receivedToken || $receivedToken !== $expectedToken) {
             Log::warning('Google Form Unauthorized: Token Mismatch');
             return response()->json(['message' => 'Unauthorized'], 401);
         }
