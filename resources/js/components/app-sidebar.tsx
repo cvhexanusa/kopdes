@@ -23,28 +23,51 @@ export function AppSidebar() {
         ? dashboard(page.props.currentTeam.slug)
         : '/';
 
+    const user = page.props.auth.user;
+    const isPengawas = user.peran === 'pengawas';
+
     const mainNavItems: NavItem[] = [
         {
             title: 'Dashboard',
             href: dashboardUrl,
             icon: LayoutGrid,
         },
-        {
-            title: 'Instansi',
-            href: '/instansi',
-            icon: Building,
-        },
-        {
-            title: 'Pengawas',
-            href: '/pengawas',
-            icon: Users,
-        },
-        {
-            title: 'Nasabah',
-            href: '/nasabah',
-            icon: UserCheck,
-        },
     ];
+
+    if (!isPengawas) {
+        // Menu untuk Administrator
+        mainNavItems.push(
+            {
+                title: 'Instansi',
+                href: '/instansi',
+                icon: Building,
+            },
+            {
+                title: 'Pengawas',
+                href: '/pengawas',
+                icon: Users,
+            },
+            {
+                title: 'Nasabah',
+                href: '/nasabah',
+                icon: UserCheck,
+            }
+        );
+    } else {
+        // Menu untuk Pengawas
+        mainNavItems.push(
+            {
+                title: 'Profil Instansi',
+                href: user.instansi_id ? `/instansi/${user.instansi_id}` : '/instansi',
+                icon: Building,
+            },
+            {
+                title: 'Nasabah',
+                href: '/nasabah',
+                icon: UserCheck,
+            }
+        );
+    }
 
     const footerNavItems: NavItem[] = [
         {

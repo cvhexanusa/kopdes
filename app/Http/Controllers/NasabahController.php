@@ -14,7 +14,13 @@ class NasabahController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
         $query = Nasabah::with('instansi');
+
+        // Jika user adalah Pengawas, hanya tampilkan nasabah dari instansinya sendiri
+        if ($user->peran === 'pengawas') {
+            $query->where('instansi_id', $user->instansi_id);
+        }
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -26,7 +32,13 @@ class NasabahController extends Controller
         }
 
         $nasabahs = $query->paginate(10)->withQueryString();
-        $instansis = Instansi::select('instansi_id', 'nama')->get();
+        
+        // Filter daftar instansi untuk dropdown (jika ada fitur create/edit)
+        $instansisQuery = Instansi::select('instansi_id', 'nama');
+        if ($user->peran === 'pengawas') {
+            $instansisQuery->where('instansi_id', $user->instansi_id);
+        }
+        $instansis = $instansisQuery->get();
 
         return Inertia::render('nasabah/index', [
             'nasabahs' => $nasabahs,
@@ -41,6 +53,12 @@ class NasabahController extends Controller
     public function show($id)
     {
         $nasabah = Nasabah::with('instansi')->findOrFail($id);
+        
+        // Security check for Pengawas
+        if (auth()->user()->peran === 'pengawas' && $nasabah->instansi_id !== auth()->user()->instansi_id) {
+            abort(403);
+        }
+
         return Inertia::render('nasabah/show', [
             'nasabah' => $nasabah
         ]);
@@ -52,6 +70,11 @@ class NasabahController extends Controller
     public function update(Request $request, $id)
     {
         $nasabah = Nasabah::findOrFail($id);
+
+        // Security check for Pengawas
+        if (auth()->user()->peran === 'pengawas' && $nasabah->instansi_id !== auth()->user()->instansi_id) {
+            abort(403);
+        }
 
         $request->validate([
             'nama' => 'required|string|max:255',
@@ -80,6 +103,12 @@ class NasabahController extends Controller
     public function destroy($id)
     {
         $nasabah = Nasabah::findOrFail($id);
+
+        // Security check for Pengawas
+        if (auth()->user()->peran === 'pengawas' && $nasabah->instansi_id !== auth()->user()->instansi_id) {
+            abort(403);
+        }
+
         $nasabah->delete();
 
         Inertia::flash('toast', [

@@ -13,7 +13,13 @@ class InstansiController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
         $query = Instansi::query();
+
+        // Jika Pengawas, hanya lihat instansinya sendiri
+        if ($user->peran === 'pengawas') {
+            $query->where('instansi_id', $user->instansi_id);
+        }
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -38,6 +44,11 @@ class InstansiController extends Controller
      */
     public function store(Request $request)
     {
+        // Hanya Admin yang bisa buat instansi baru
+        if (auth()->user()->peran !== 'administrator') {
+            abort(403);
+        }
+
         $request->validate([
             'nama' => 'required|string|max:255',
             'desa' => 'required|string|max:255',
@@ -66,11 +77,33 @@ class InstansiController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show($id)
+    {
+        $instansi = Instansi::findOrFail($id);
+
+        // Security check for Pengawas
+        if (auth()->user()->peran === 'pengawas' && $id !== auth()->user()->instansi_id) {
+            abort(403);
+        }
+
+        return Inertia::render('instansi/show', [
+            'instansi' => $instansi
+        ]);
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
     {
         $instansi = Instansi::findOrFail($id);
+
+        // Security check
+        if (auth()->user()->peran === 'pengawas' && $id !== auth()->user()->instansi_id) {
+            abort(403);
+        }
 
         $request->validate([
             'nama' => 'required|string|max:255',
@@ -96,6 +129,11 @@ class InstansiController extends Controller
      */
     public function destroy($id)
     {
+        // Hanya Admin yang bisa hapus instansi
+        if (auth()->user()->peran !== 'administrator') {
+            abort(403);
+        }
+
         $instansi = Instansi::findOrFail($id);
         $instansi->delete();
 
