@@ -1,0 +1,48 @@
+function onFormSubmit(e) {
+  // 1. Ambil data dari jawaban form
+  // responses[0] biasanya adalah Timestamp otomatis dari Google
+  var responses = e.values;
+  
+  // 2. Susun data dalam format JSON sesuai struktur database nasabahs
+  var payload = {
+    "nama": responses[1],          // Pertanyaan 1 di Form
+    "nik": responses[2],           // Pertanyaan 2 di Form
+    "domisili": responses[3],      // Pertanyaan 3 di Form
+    "tempat_lahir": responses[4],  // Pertanyaan 4 di Form
+    "tanggal_lahir": responses[5], // Pertanyaan 5 di Form (Pastikan formatnya YYYY-MM-DD)
+    "no_handphone": responses[6],  // Pertanyaan 6 di Form
+    "pekerjaan": responses[7],     // Pertanyaan 7 di Form
+    
+    // PENTING: instansi_id wajib diisi dengan UUID Instansi yang valid dari database.
+    // Anda bisa mendapatkan ID ini dari tabel Instansi di aplikasi.
+    "instansi_id": "019e1cc1-ccd0-73f7-b0d0-de0ad6ca67a6" 
+  };
+
+  // 3. Konfigurasi Request
+  var options = {
+    "method": "post",
+    "contentType": "application/json",
+    "headers": {
+      "X-Google-Form-Token": "NasabahSecureToken2026"
+    },
+    "payload": JSON.stringify(payload),
+    "muteHttpExceptions": true
+  };
+
+  // 4. Kirim data ke URL API (Ganti 127.0.0.1 dengan domain/IP publik server jika sudah online)
+  var url = "https://kopdes.hexanusa.com/api/nasabah";
+  
+  try {
+    var response = UrlFetchApp.fetch(url, options);
+    var responseCode = response.getResponseCode();
+    var responseBody = response.getContentText();
+    
+    if (responseCode === 201) {
+      Logger.log("Berhasil: " + responseBody);
+    } else {
+      Logger.log("Gagal (Status " + responseCode + "): " + responseBody);
+    }
+  } catch (err) {
+    Logger.log("Error Koneksi: " + err.toString());
+  }
+}

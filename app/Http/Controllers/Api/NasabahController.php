@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Nasabah;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class NasabahController extends Controller
@@ -14,9 +15,12 @@ class NasabahController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info('Google Form Data Request:', $request->all());
+        
         $token = $request->header('X-Google-Form-Token');
         
         if (!$token || $token !== env('GOOGLE_FORM_TOKEN')) {
+            Log::warning('Google Form Unauthorized: Token Mismatch');
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -32,14 +36,20 @@ class NasabahController extends Controller
         ]);
 
         if ($validator->fails()) {
+            Log::error('Google Form Validation Error:', $validator->errors()->toArray());
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $nasabah = Nasabah::create($request->all());
-
-        return response()->json([
-            'message' => 'Nasabah created successfully',
-            'data' => $nasabah
-        ], 201);
+        try {
+            $nasabah = Nasabah::create($request->all());
+            Log::info('Nasabah Created from Google Form: ' . $nasabah->nasabah_id);
+            return response()->json([
+                'message' => 'Nasabah created successfully',
+                'data' => $nasabah
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error('Error saving Nasabah from Google Form: ' . $e->getMessage());
+            return response()->json(['message' => 'Internal Server Error'], 500);
+        }
     }
 }
