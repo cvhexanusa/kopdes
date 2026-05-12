@@ -1,0 +1,109 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Instansi;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+
+class InstansiController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+        $query = Instansi::query();
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('desa', 'like', "%{$search}%")
+                  ->orWhere('kecamatan', 'like', "%{$search}%")
+                  ->orWhere('kabupaten', 'like', "%{$search}%");
+            });
+        }
+
+        $instansis = $query->paginate(10)->withQueryString();
+
+        return Inertia::render('instansi/index', [
+            'instansis' => $instansis,
+            'filters' => $request->only(['search'])
+        ]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'desa' => 'required|string|max:255',
+            'kecamatan' => 'required|string|max:255',
+            'kabupaten' => 'required|string|max:255',
+            'kode_pos' => 'required|string|max:10',
+            'waktu_aktif' => 'nullable|date',
+        ]);
+
+        Instansi::create([
+            'nama' => $request->nama,
+            'desa' => $request->desa,
+            'kecamatan' => $request->kecamatan,
+            'kabupaten' => $request->kabupaten,
+            'kode_pos' => $request->kode_pos,
+            'waktu_aktif' => $request->waktu_aktif,
+            'users_id' => $request->user()->users_id,
+        ]);
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => 'Instansi berhasil ditambahkan'
+        ]);
+
+        return redirect()->back();
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, $id)
+    {
+        $instansi = Instansi::findOrFail($id);
+
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'desa' => 'required|string|max:255',
+            'kecamatan' => 'required|string|max:255',
+            'kabupaten' => 'required|string|max:255',
+            'kode_pos' => 'required|string|max:10',
+            'waktu_aktif' => 'nullable|date',
+        ]);
+
+        $instansi->update($request->all());
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => 'Data instansi berhasil diperbarui'
+        ]);
+
+        return redirect()->back();
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($id)
+    {
+        $instansi = Instansi::findOrFail($id);
+        $instansi->delete();
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => 'Instansi berhasil dihapus'
+        ]);
+
+        return redirect()->back();
+    }
+}
