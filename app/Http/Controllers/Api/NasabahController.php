@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Nasabah;
+use App\Models\Instansi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -15,22 +16,23 @@ class NasabahController extends Controller
      */
     public function store(Request $request)
     {
-        // Mendukung X-Form-Token atau X-Google-Form-Token untuk fleksibilitas
         $receivedToken = $request->header('X-Form-Token') ?? $request->header('X-Google-Form-Token');
         $expectedToken = config('services.google_form_token');
 
-        Log::info('Google Form API Access:', [
-            'has_token' => !empty($receivedToken),
-            'token_match' => ($receivedToken === $expectedToken),
-            'received' => $receivedToken,
-            'expected' => $expectedToken
-        ]);
-        
         if (!$receivedToken || $receivedToken !== $expectedToken) {
+            Log::warning('Google Form Unauthorized: Token Mismatch');
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        $validator = Validator::make($request->all(), [
+        // Bersihkan data dari spasi/karakter aneh
+        $data = $request->all();
+        foreach ($data as $key => $value) {
+            if (is_string($value)) {
+                $data[$key] = trim($value);
+            }
+        }
+
+        $validator = Validator::make($data, [
             'nama' => 'required|string|max:255',
             'nik' => 'required|string|unique:nasabahs,nik',
             'domisili' => 'required|string',
@@ -42,19 +44,22 @@ class NasabahController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::error('Google Form Validation Error:', $validator->errors()->toArray());
+            Log::error('Google Form Validation Error:', [
+                'errors' => $validator->errors()->toArray(),
+                'input_received' => $data
+            ]);
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
         try {
-            $nasabah = Nasabah::create($request->all());
-            Log::info('Nasabah Created: ' . $nasabah->nasabah_id);
+            $nasabah = Nasabah::create($data);
+            Log::info('Nasabah Created from Google Form: ' . $nasabah->nasabah_id);
             return response()->json([
                 'message' => 'Nasabah created successfully',
                 'data' => $nasabah
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Database Error: ' . $e->getMessage());
+            Log::error('Error saving Nasabah: ' . $e->getMessage());
             return response()->json(['message' => 'Internal Server Error'], 500);
         }
     }
