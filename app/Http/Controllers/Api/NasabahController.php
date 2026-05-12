@@ -15,17 +15,18 @@ class NasabahController extends Controller
      */
     public function store(Request $request)
     {
-        $receivedToken = $request->header('X-Google-Form-Token');
-        $expectedToken = env('GOOGLE_FORM_TOKEN');
+        // Mendukung X-Form-Token atau X-Google-Form-Token untuk fleksibilitas
+        $receivedToken = $request->header('X-Form-Token') ?? $request->header('X-Google-Form-Token');
+        $expectedToken = config('services.google_form_token');
 
-        Log::info('Google Form Debug:', [
-            'received_token' => $receivedToken,
-            'expected_token' => $expectedToken,
-            'all_headers' => $request->headers->all(),
+        Log::info('Google Form API Access:', [
+            'has_token' => !empty($receivedToken),
+            'token_match' => ($receivedToken === $expectedToken),
+            'received' => $receivedToken,
+            'expected' => $expectedToken
         ]);
         
         if (!$receivedToken || $receivedToken !== $expectedToken) {
-            Log::warning('Google Form Unauthorized: Token Mismatch');
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
@@ -47,13 +48,13 @@ class NasabahController extends Controller
 
         try {
             $nasabah = Nasabah::create($request->all());
-            Log::info('Nasabah Created from Google Form: ' . $nasabah->nasabah_id);
+            Log::info('Nasabah Created: ' . $nasabah->nasabah_id);
             return response()->json([
                 'message' => 'Nasabah created successfully',
                 'data' => $nasabah
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Error saving Nasabah from Google Form: ' . $e->getMessage());
+            Log::error('Database Error: ' . $e->getMessage());
             return response()->json(['message' => 'Internal Server Error'], 500);
         }
     }

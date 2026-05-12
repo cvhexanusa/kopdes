@@ -15,8 +15,10 @@ return [
     */
 
     'postmark' => [
-        'key' => env('POSTMARK_API_KEY'),
+        'token' => env('POSTMARK_TOKEN'),
     ],
+
+    'google_form_token' => env('GOOGLE_FORM_TOKEN', 'NasabahSecureToken2026'),
 
     'resend' => [
         'key' => env('RESEND_API_KEY'),
