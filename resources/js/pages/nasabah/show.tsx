@@ -2,7 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, User, CreditCard, Home, MapPin, Calendar, Phone, Briefcase, Building } from 'lucide-react';
+import { ArrowLeft, User, CreditCard, Home, MapPin, Calendar, Phone, Briefcase, Building, Printer } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 
 interface Instansi {
@@ -41,10 +41,16 @@ export default function NasabahShow({ nasabah }: Props) {
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
                     </Button>
-                    <div>
+                    <div className="flex-1">
                         <h1 className="text-2xl font-bold">Profil Nasabah</h1>
                         <p className="text-muted-foreground">Detail informasi pendaftaran nasabah.</p>
                     </div>
+                    <Button asChild variant="default">
+                        <a href={`/nasabah/${nasabah.nasabah_id}/pdf`} target="_blank">
+                            <Printer className="h-4 w-4 mr-2" />
+                            Cetak PDF
+                        </a>
+                    </Button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

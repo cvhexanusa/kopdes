@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Instansi;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 class InstansiController extends Controller
 {
@@ -44,7 +45,6 @@ class InstansiController extends Controller
      */
     public function store(Request $request)
     {
-        // Hanya Admin yang bisa buat instansi baru
         if (auth()->user()->peran !== 'administrator') {
             abort(403);
         }
@@ -82,10 +82,18 @@ class InstansiController extends Controller
     public function show($id)
     {
         $instansi = Instansi::findOrFail($id);
+        $user = auth()->user();
 
         // Security check for Pengawas
-        if (auth()->user()->peran === 'pengawas' && $id !== auth()->user()->instansi_id) {
-            abort(403);
+        if ($user->peran === 'pengawas') {
+            if (trim((string)$id) !== trim((string)$user->instansi_id)) {
+                Log::warning('Unauthorized Instansi access by Pengawas', [
+                    'user_id' => $user->users_id,
+                    'user_instansi' => $user->instansi_id,
+                    'requested_id' => $id
+                ]);
+                abort(403, 'Anda hanya dapat mengakses profil instansi Anda sendiri.');
+            }
         }
 
         return Inertia::render('instansi/show', [
@@ -99,9 +107,10 @@ class InstansiController extends Controller
     public function update(Request $request, $id)
     {
         $instansi = Instansi::findOrFail($id);
+        $user = auth()->user();
 
         // Security check
-        if (auth()->user()->peran === 'pengawas' && $id !== auth()->user()->instansi_id) {
+        if ($user->peran === 'pengawas' && trim((string)$id) !== trim((string)$user->instansi_id)) {
             abort(403);
         }
 
@@ -129,7 +138,6 @@ class InstansiController extends Controller
      */
     public function destroy($id)
     {
-        // Hanya Admin yang bisa hapus instansi
         if (auth()->user()->peran !== 'administrator') {
             abort(403);
         }

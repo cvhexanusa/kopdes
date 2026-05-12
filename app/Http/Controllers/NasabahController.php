@@ -6,6 +6,8 @@ use App\Models\Nasabah;
 use App\Models\Instansi;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class NasabahController extends Controller
 {
@@ -33,7 +35,6 @@ class NasabahController extends Controller
 
         $nasabahs = $query->paginate(10)->withQueryString();
         
-        // Filter daftar instansi untuk dropdown (jika ada fitur create/edit)
         $instansisQuery = Instansi::select('instansi_id', 'nama');
         if ($user->peran === 'pengawas') {
             $instansisQuery->where('instansi_id', $user->instansi_id);
@@ -53,10 +54,18 @@ class NasabahController extends Controller
     public function show($id)
     {
         $nasabah = Nasabah::with('instansi')->findOrFail($id);
+        $user = auth()->user();
         
         // Security check for Pengawas
-        if (auth()->user()->peran === 'pengawas' && $nasabah->instansi_id !== auth()->user()->instansi_id) {
-            abort(403);
+        if ($user->peran === 'pengawas') {
+            if (trim((string)$nasabah->instansi_id) !== trim((string)$user->instansi_id)) {
+                Log::warning('Unauthorized access attempt by Pengawas', [
+                    'user_id' => $user->users_id,
+                    'user_instansi' => $user->instansi_id,
+                    'nasabah_instansi' => $nasabah->instansi_id
+                ]);
+                abort(403, 'Anda tidak memiliki akses ke data nasabah ini.');
+            }
         }
 
         return Inertia::render('nasabah/show', [
@@ -70,9 +79,10 @@ class NasabahController extends Controller
     public function update(Request $request, $id)
     {
         $nasabah = Nasabah::findOrFail($id);
+        $user = auth()->user();
 
         // Security check for Pengawas
-        if (auth()->user()->peran === 'pengawas' && $nasabah->instansi_id !== auth()->user()->instansi_id) {
+        if ($user->peran === 'pengawas' && trim((string)$nasabah->instansi_id) !== trim((string)$user->instansi_id)) {
             abort(403);
         }
 
@@ -98,14 +108,34 @@ class NasabahController extends Controller
     }
 
     /**
+     * Export nasabah data to PDF.
+     */
+    public function pdf($id)
+    {
+        $nasabah = Nasabah::with('instansi')->findOrFail($id);
+        $user = auth()->user();
+
+        // Security check for Pengawas
+        if ($user->peran === 'pengawas' && trim((string)$nasabah->instansi_id) !== trim((string)$user->instansi_id)) {
+            abort(403);
+        }
+
+        $pdf = Pdf::loadView('nasabah.pdf', compact('nasabah'))
+                  ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('Nasabah_' . $nasabah->nama . '.pdf');
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy($id)
     {
         $nasabah = Nasabah::findOrFail($id);
+        $user = auth()->user();
 
         // Security check for Pengawas
-        if (auth()->user()->peran === 'pengawas' && $nasabah->instansi_id !== auth()->user()->instansi_id) {
+        if ($user->peran === 'pengawas' && trim((string)$nasabah->instansi_id) !== trim((string)$user->instansi_id)) {
             abort(403);
         }
 

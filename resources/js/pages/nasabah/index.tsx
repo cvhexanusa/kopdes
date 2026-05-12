@@ -19,7 +19,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useState, useEffect } from 'react';
-import { Eye, Pencil, Trash2, Search } from 'lucide-react';
+import { Eye, Pencil, Trash2, Search, Printer } from 'lucide-react';
 import nasabahRoutes from '@/routes/nasabah';
 import Pagination from '@/components/pagination';
 
@@ -161,6 +161,15 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                                                     <Link href={`/nasabah/${n.nasabah_id}`}>
                                                         <Eye className="h-4 w-4" />
                                                     </Link>
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    asChild
+                                                >
+                                                    <a href={`/nasabah/${n.nasabah_id}/pdf`} target="_blank">
+                                                        <Printer className="h-4 w-4" />
+                                                    </a>
                                                 </Button>
                                                 <Button
                                                     variant="outline"
