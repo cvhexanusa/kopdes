@@ -8,6 +8,8 @@ use App\Models\Instansi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class NasabahController extends Controller
 {
@@ -24,10 +26,10 @@ class NasabahController extends Controller
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
-        // Bersihkan data dari spasi/karakter aneh
+        // Bersihkan data teks
         $data = $request->all();
         foreach ($data as $key => $value) {
-            if (is_string($value)) {
+            if (is_string($value) && !Str::startsWith($value, 'data:image')) {
                 $data[$key] = trim($value);
             }
         }
@@ -44,16 +46,20 @@ class NasabahController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::error('Google Form Validation Error:', [
-                'errors' => $validator->errors()->toArray(),
-                'input_received' => $data
-            ]);
             return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Handle File Upload dari Google Apps Script (Base64)
+        if ($request->has('foto_ktp_base64')) {
+            $data['foto_ktp'] = $this->uploadBase64($request->foto_ktp_base64, 'ktp');
+        }
+        if ($request->has('foto_kk_base64')) {
+            $data['foto_kk'] = $this->uploadBase64($request->foto_kk_base64, 'kk');
         }
 
         try {
             $nasabah = Nasabah::create($data);
-            Log::info('Nasabah Created from Google Form: ' . $nasabah->nasabah_id);
+            Log::info('Nasabah Created with Files: ' . $nasabah->nasabah_id);
             return response()->json([
                 'message' => 'Nasabah created successfully',
                 'data' => $nasabah
@@ -61,6 +67,30 @@ class NasabahController extends Controller
         } catch (\Exception $e) {
             Log::error('Error saving Nasabah: ' . $e->getMessage());
             return response()->json(['message' => 'Internal Server Error'], 500);
+        }
+    }
+
+    /**
+     * Helper to upload base64 image
+     */
+    private function uploadBase64($base64Data, $prefix)
+    {
+        try {
+            if (empty($base64Data)) return null;
+            
+            // Format: data:image/jpeg;base64,xxxx
+            $image_service_str = explode(',', $base64Data);
+            if (count($image_service_str) < 2) return null;
+            
+            $image = base64_decode($image_service_str[1]);
+            $filename = $prefix . '_' . time() . '_' . Str::random(10) . '.jpg';
+            
+            Storage::disk('public')->put('nasabah/' . $filename, $image);
+            
+            return 'nasabah/' . $filename;
+        } catch (\Exception $e) {
+            Log::error('Base64 Upload Error: ' . $e->getMessage());
+            return null;
         }
     }
 }

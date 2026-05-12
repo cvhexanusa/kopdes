@@ -134,12 +134,23 @@ export default function NasabahShow({ nasabah }: Props) {
                                     {nasabah.foto_ktp ? (
                                         <div className="relative group overflow-hidden rounded-lg border bg-muted aspect-video flex items-center justify-center">
                                             <img 
-                                                src={`https://drive.google.com/thumbnail?id=${nasabah.foto_ktp}&sz=w800`} 
+                                                src={nasabah.foto_ktp.startsWith('nasabah/') 
+                                                    ? `/storage/${nasabah.foto_ktp}` 
+                                                    : `https://drive.google.com/thumbnail?id=${nasabah.foto_ktp}&sz=w800`} 
                                                 alt="KTP" 
                                                 className="w-full h-full object-cover transition-transform group-hover:scale-105"
                                             />
                                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                <Button variant="secondary" size="sm" onClick={() => window.open(`https://drive.google.com/uc?id=${nasabah.foto_ktp}`, '_blank')}>
+                                                <Button 
+                                                    variant="secondary" 
+                                                    size="sm" 
+                                                    onClick={() => window.open(
+                                                        nasabah.foto_ktp?.startsWith('nasabah/') 
+                                                        ? `/storage/${nasabah.foto_ktp}` 
+                                                        : `https://drive.google.com/uc?id=${nasabah.foto_ktp}`, 
+                                                        '_blank'
+                                                    )}
+                                                >
                                                     Lihat Full HD
                                                 </Button>
                                             </div>
@@ -160,12 +171,23 @@ export default function NasabahShow({ nasabah }: Props) {
                                     {nasabah.foto_kk ? (
                                         <div className="relative group overflow-hidden rounded-lg border bg-muted aspect-video flex items-center justify-center">
                                             <img 
-                                                src={`https://drive.google.com/thumbnail?id=${nasabah.foto_kk}&sz=w800`} 
+                                                src={nasabah.foto_kk.startsWith('nasabah/') 
+                                                    ? `/storage/${nasabah.foto_kk}` 
+                                                    : `https://drive.google.com/thumbnail?id=${nasabah.foto_kk}&sz=w800`} 
                                                 alt="KK" 
                                                 className="w-full h-full object-cover transition-transform group-hover:scale-105"
                                             />
                                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                <Button variant="secondary" size="sm" onClick={() => window.open(`https://drive.google.com/uc?id=${nasabah.foto_kk}`, '_blank')}>
+                                                <Button 
+                                                    variant="secondary" 
+                                                    size="sm" 
+                                                    onClick={() => window.open(
+                                                        nasabah.foto_kk?.startsWith('nasabah/') 
+                                                        ? `/storage/${nasabah.foto_kk}` 
+                                                        : `https://drive.google.com/uc?id=${nasabah.foto_kk}`, 
+                                                        '_blank'
+                                                    )}
+                                                >
                                                     Lihat Full HD
                                                 </Button>
                                             </div>
