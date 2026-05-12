@@ -240,6 +240,43 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                                     <Label className="text-muted-foreground">Instansi</Label>
                                     <p className="font-medium">{selectedNasabah.instansi?.nama || '-'}</p>
                                 </div>
+
+                                <div className="col-span-2 grid grid-cols-2 gap-4 mt-4">
+                                    <div className="space-y-2">
+                                        <Label className="text-muted-foreground">Foto KTP</Label>
+                                        {selectedNasabah.foto_ktp ? (
+                                            <div className="border rounded-md overflow-hidden bg-muted aspect-[3/2] flex items-center justify-center">
+                                                <img 
+                                                    src={`https://drive.google.com/thumbnail?id=${selectedNasabah.foto_ktp}&sz=w500`} 
+                                                    alt="KTP" 
+                                                    className="w-full h-full object-cover cursor-pointer"
+                                                    onClick={() => window.open(`https://drive.google.com/uc?id=${selectedNasabah.foto_ktp}`, '_blank')}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="border rounded-md bg-muted aspect-[3/2] flex items-center justify-center text-xs text-muted-foreground italic">
+                                                Tidak ada foto
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-muted-foreground">Foto KK</Label>
+                                        {selectedNasabah.foto_kk ? (
+                                            <div className="border rounded-md overflow-hidden bg-muted aspect-[3/2] flex items-center justify-center">
+                                                <img 
+                                                    src={`https://drive.google.com/thumbnail?id=${selectedNasabah.foto_kk}&sz=w500`} 
+                                                    alt="KK" 
+                                                    className="w-full h-full object-cover cursor-pointer"
+                                                    onClick={() => window.open(`https://drive.google.com/uc?id=${selectedNasabah.foto_kk}`, '_blank')}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="border rounded-md bg-muted aspect-[3/2] flex items-center justify-center text-xs text-muted-foreground italic">
+                                                Tidak ada foto
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         )}
                         <DialogFooter>
