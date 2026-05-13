@@ -130,14 +130,14 @@ export default function InstansiIndex({ instansis, filters }: Props) {
         <>
             <Head title="Data Instansi" />
             <div className="flex flex-col gap-6 p-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold">Data Instansi</h1>
-                        <p className="text-muted-foreground">Kelola daftar instansi di sistem.</p>
+                        <h1 className="text-2xl font-bold tracking-tight">Instansi</h1>
+                        <p className="text-muted-foreground">Kelola data instansi Anda di sini.</p>
                     </div>
                     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                         <DialogTrigger asChild>
-                            <Button>
+                            <Button className="w-full sm:w-auto">
                                 <Plus className="mr-2 h-4 w-4" />
                                 Tambah Instansi
                             </Button>
@@ -194,8 +194,8 @@ export default function InstansiIndex({ instansis, filters }: Props) {
                     </Dialog>
                 </div>
 
-                <div className="flex items-center gap-2 max-w-sm">
-                    <div className="relative w-full">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div className="relative w-full sm:max-w-sm">
                         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder="Cari instansi..."
@@ -206,14 +206,14 @@ export default function InstansiIndex({ instansis, filters }: Props) {
                     </div>
                 </div>
 
-                <div className="rounded-md border bg-card">
+                <div className="rounded-md border bg-card overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b bg-muted/50">
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Nama</th>
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Wilayah</th>
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Kode Pos</th>
-                                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Aksi</th>
+                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap">Nama</th>
+                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap">Wilayah</th>
+                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap">Kode Pos</th>
+                                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>

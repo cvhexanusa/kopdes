@@ -14,7 +14,7 @@ export default function Pagination({ links }: Props) {
     if (links.length <= 3) return null;
 
     return (
-        <div className="flex items-center justify-center gap-1 py-4">
+        <div className="flex items-center justify-center gap-1 py-4 flex-wrap">
             {links.map((link, i) => {
                 const isFirst = i === 0;
                 const isLast = i === links.length - 1;

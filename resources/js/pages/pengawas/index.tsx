@@ -117,14 +117,14 @@ export default function PengawasIndex({ pengawas, instansis, filters }: Props) {
         <>
             <Head title="Data Pengawas" />
             <div className="flex flex-col gap-6 p-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold">Data Pengawas</h1>
-                        <p className="text-muted-foreground">Kelola data pengawas (User dengan peran pengawas).</p>
+                        <h1 className="text-2xl font-bold tracking-tight">Pengawas</h1>
+                        <p className="text-muted-foreground">Kelola data pengawas instansi.</p>
                     </div>
                     <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
                         <DialogTrigger asChild>
-                            <Button>
+                            <Button className="w-full sm:w-auto">
                                 <Plus className="mr-2 h-4 w-4" />
                                 Tambah Pengawas
                             </Button>
@@ -211,8 +211,8 @@ export default function PengawasIndex({ pengawas, instansis, filters }: Props) {
                     </Dialog>
                 </div>
 
-                <div className="flex items-center gap-2 max-w-sm">
-                    <div className="relative w-full">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div className="relative w-full sm:max-w-sm">
                         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder="Cari pengawas..."
@@ -223,14 +223,14 @@ export default function PengawasIndex({ pengawas, instansis, filters }: Props) {
                     </div>
                 </div>
 
-                <div className="rounded-md border bg-card">
+                <div className="rounded-md border bg-card overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="border-b bg-muted/50 transition-colors">
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Nama</th>
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Email</th>
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Instansi</th>
-                                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground">Aksi</th>
+                            <tr className="border-b bg-muted/50">
+                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap">Nama</th>
+                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap">Email</th>
+                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground whitespace-nowrap">Instansi</th>
+                                <th className="h-12 px-4 text-right align-middle font-medium text-muted-foreground whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
