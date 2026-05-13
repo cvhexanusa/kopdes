@@ -12,7 +12,7 @@ class InstansiController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request, $peran)
+    public function index(Request $request, $peran = null)
     {
         $user = auth()->user();
         $query = Instansi::query();
@@ -43,7 +43,7 @@ class InstansiController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, $peran)
+    public function store(Request $request, $peran = null)
     {
         if (auth()->user()->peran !== 'administrator') {
             Log::warning('Unauthorized instansi creation attempt', ['user' => auth()->id(), 'role' => auth()->user()->peran]);
@@ -90,7 +90,7 @@ class InstansiController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($peran, $id)
+    public function show($peran = null, $id = null)
     {
         $instansi = Instansi::findOrFail($id);
         $user = auth()->user();
@@ -115,7 +115,7 @@ class InstansiController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $peran, $id)
+    public function update(Request $request, $peran = null, $id = null)
     {
         $instansi = Instansi::findOrFail($id);
         $user = auth()->user();
@@ -147,7 +147,7 @@ class InstansiController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($peran, $id)
+    public function destroy($peran = null, $id = null)
     {
         if (auth()->user()->peran !== 'administrator') {
             abort(403);
