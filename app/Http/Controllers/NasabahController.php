@@ -53,9 +53,9 @@ class NasabahController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($peran, $id)
+    public function show($peran, $nasabah)
     {
-        $nasabah = Nasabah::with('instansi')->findOrFail($id);
+        $nasabah = Nasabah::with('instansi')->findOrFail($nasabah);
         $user = auth()->user();
         
         // Security check for Pengawas
@@ -78,9 +78,9 @@ class NasabahController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $peran, $id)
+    public function update(Request $request, $peran, $nasabah)
     {
-        $nasabah = Nasabah::findOrFail($id);
+        $nasabah = Nasabah::findOrFail($nasabah);
         $user = auth()->user();
 
         // Security check for Pengawas
@@ -134,9 +134,9 @@ class NasabahController extends Controller
     /**
      * Export nasabah data to PDF.
      */
-    public function pdf($peran, $id)
+    public function pdf($peran, $nasabah)
     {
-        $nasabah = Nasabah::with('instansi')->findOrFail($id);
+        $nasabah = Nasabah::with('instansi')->findOrFail($nasabah);
         $user = auth()->user();
 
         // Security check for Pengawas
@@ -251,9 +251,9 @@ class NasabahController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($peran, $id)
+    public function destroy($peran, $nasabah)
     {
-        $nasabah = Nasabah::findOrFail($id);
+        $nasabah = Nasabah::findOrFail($nasabah);
         $user = auth()->user();
 
         // Security check for Pengawas

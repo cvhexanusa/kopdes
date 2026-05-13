@@ -67,9 +67,9 @@ class PengawasController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $peran, $id)
+    public function update(Request $request, $peran, $pengawa)
     {
-        $pengawa = User::findOrFail($id);
+        $pengawa = User::findOrFail($pengawa);
         
         $request->validate([
             'name' => 'required|string|max:255',
@@ -94,9 +94,9 @@ class PengawasController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($peran, $id)
+    public function destroy($peran, $pengawa)
     {
-        $pengawa = User::findOrFail($id);
+        $pengawa = User::findOrFail($pengawa);
         $pengawa->delete();
 
         Inertia::flash('toast', [

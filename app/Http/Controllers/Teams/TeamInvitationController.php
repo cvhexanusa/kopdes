@@ -58,7 +58,7 @@ class TeamInvitationController extends Controller
     /**
      * Accept the invitation.
      */
-    public function accept(AcceptTeamInvitationRequest $request, TeamInvitation $invitation): RedirectResponse
+    public function accept(AcceptTeamInvitationRequest $request, $peran, TeamInvitation $invitation): RedirectResponse
     {
         $user = $request->user();
 

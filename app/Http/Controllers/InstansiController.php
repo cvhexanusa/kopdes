@@ -90,9 +90,9 @@ class InstansiController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($peran, $id)
+    public function show($peran, $instansi)
     {
-        $instansi = Instansi::findOrFail($id);
+        $instansi = Instansi::findOrFail($instansi);
         $user = auth()->user();
 
         // Security check for Pengawas
@@ -115,9 +115,9 @@ class InstansiController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $peran, $id)
+    public function update(Request $request, $peran, $instansi)
     {
-        $instansi = Instansi::findOrFail($id);
+        $instansi = Instansi::findOrFail($instansi);
         $user = auth()->user();
 
         // Security check
@@ -147,13 +147,13 @@ class InstansiController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($peran, $id)
+    public function destroy($peran, $instansi)
     {
         if (auth()->user()->peran !== 'administrator') {
             abort(403);
         }
 
-        $instansi = Instansi::findOrFail($id);
+        $instansi = Instansi::findOrFail($instansi);
         $instansi->delete();
 
         Inertia::flash('toast', [

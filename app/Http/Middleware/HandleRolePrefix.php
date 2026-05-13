@@ -34,8 +34,6 @@ class HandleRolePrefix
                 return redirect($newUrl);
             }
 
-            // Forget 'peran' so it doesn't get passed as an argument to controller methods
-            $request->route()->forgetParameter('peran');
         }
 
         return $next($request);
