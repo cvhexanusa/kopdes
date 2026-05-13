@@ -130,23 +130,9 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
     const handleExportDrive = () => {
         if (selectedIds.length === 0) return;
         
-        setIsExporting(true);
-        router.post(`${rolePrefix}/nasabah/export-drive`, {
-            ids: selectedIds
-        }, {
-            onSuccess: () => {
-                toast.success('Export ke Google Drive berhasil!');
-                setSelectedIds([]);
-                setIsExporting(false);
-            },
-            onError: (errors: any) => {
-                toast.error(errors.message || 'Gagal export ke Google Drive');
-                setIsExporting(false);
-            },
-            onFinish: () => {
-                setIsExporting(false);
-            }
-        });
+        const ids = selectedIds.join(',');
+        window.open(`${rolePrefix}/nasabah/export-drive?ids=${ids}`, '_blank');
+        setSelectedIds([]);
     };
 
     return (

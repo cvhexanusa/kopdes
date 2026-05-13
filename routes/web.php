@@ -17,6 +17,9 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth'])->group(function () {
+    // Google Drive Callback (outside prefix for consistent Redirect URI)
+    Route::get('nasabah/export-drive/callback', [NasabahController::class, 'googleCallback'])->name('nasabah.export-drive.callback');
+
     // Redirect /dashboard to the role-prefixed version
     Route::get('dashboard', function () {
         return redirect(auth()->user()->peran . '/dashboard');
@@ -35,8 +38,7 @@ Route::middleware(['auth'])->group(function () {
         
         // Nasabah Routes
         Route::get('nasabah/{nasabah}/pdf', [NasabahController::class, 'pdf'])->name('nasabah.pdf');
-        Route::post('nasabah/export-drive', [NasabahController::class, 'exportToDrive'])->name('nasabah.export-drive');
-        Route::get('nasabah/export-drive/callback', [NasabahController::class, 'googleCallback'])->name('nasabah.export-drive.callback');
+        Route::get('nasabah/export-drive', [NasabahController::class, 'exportToDrive'])->name('nasabah.export-drive');
         Route::resource('nasabah', NasabahController::class);
     });
 });

@@ -155,26 +155,32 @@ class NasabahController extends Controller
      */
     public function exportToDrive(Request $request, GoogleDriveService $driveService)
     {
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'exists:nasabahs,nasabah_id'
-        ]);
+        $ids = $request->ids;
+        
+        // Handle comma-separated string from GET
+        if (is_string($ids)) {
+            $ids = explode(',', $ids);
+        }
+
+        if (!$ids || !is_array($ids)) {
+            return "Pilih data nasabah terlebih dahulu.";
+        }
 
         $token = session('google_drive_token');
 
         if (!$token) {
-            session(['nasabah_export_ids' => $request->ids]);
-            return Inertia::location($driveService->getAuthUrl());
+            session(['nasabah_export_ids' => $ids]);
+            return redirect()->away($driveService->getAuthUrl());
         }
 
         $driveService->setAccessToken($token);
 
         if ($driveService->isAccessTokenExpired()) {
-            session(['nasabah_export_ids' => $request->ids]);
-            return Inertia::location($driveService->getAuthUrl());
+            session(['nasabah_export_ids' => $ids]);
+            return redirect()->away($driveService->getAuthUrl());
         }
 
-        return $this->processExport($request->ids, $driveService);
+        return $this->processExport($ids, $driveService);
     }
 
     /**
@@ -192,14 +198,16 @@ class NasabahController extends Controller
                 $this->processExport($ids, $driveService);
                 session()->forget('nasabah_export_ids');
                 
-                Inertia::flash('toast', [
-                    'type' => 'success',
-                    'message' => 'Export ke Google Drive berhasil!'
-                ]);
+                return "<html><body style='font-family:sans-serif; text-align:center; padding-top:50px;'>
+                    <h2 style='color:green;'>Export Berhasil!</h2>
+                    <p>Data nasabah telah berhasil diexport ke Google Drive.</p>
+                    <p>Anda dapat menutup tab ini sekarang.</p>
+                    <button onclick='window.close()' style='padding:10px 20px; cursor:pointer;'>Tutup Tab</button>
+                </body></html>";
             }
         }
 
-        return redirect()->route('nasabah.index');
+        return redirect()->route('dashboard');
     }
 
     /**
@@ -222,7 +230,12 @@ class NasabahController extends Controller
             $driveService->uploadPdf($fileName, $content, $folderId);
         }
 
-        return redirect()->route('nasabah.index');
+        return "<html><body style='font-family:sans-serif; text-align:center; padding-top:50px;'>
+            <h2 style='color:green;'>Export Berhasil!</h2>
+            <p>Data nasabah telah berhasil diexport ke Google Drive.</p>
+            <p>Anda dapat menutup tab ini sekarang.</p>
+            <button onclick='window.close()' style='padding:10px 20px; cursor:pointer;'>Tutup Tab</button>
+        </body></html>";
     }
 
     /**
