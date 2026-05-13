@@ -68,6 +68,7 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
     const page = usePage();
     const rolePrefix = `/${(page.props as any).auth.user.peran}`;
 
+
     const editForm = useForm({
         nama: '',
         nik: '',
@@ -87,7 +88,8 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
             }
         }, 500);
         return () => clearTimeout(timer);
-    }, [search]);
+    }, [search, filters.search, rolePrefix]);
+
 
     const onEditSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -152,10 +154,6 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                         >
                             <CloudDownload className={`mr-2 h-4 w-4 ${isExporting ? 'animate-bounce' : ''}`} />
                             {isExporting ? 'Mengexport...' : `Export ke Drive (${selectedIds.length})`}
-                        </Button>
-                        <Button onClick={() => setIsCreateOpen(true)}>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Tambah Nasabah
                         </Button>
                     </div>
                 </div>
@@ -378,7 +376,7 @@ NasabahIndex.layout = (props: any) => ({
     breadcrumbs: [
         {
             title: 'Nasabah',
-            href: '/nasabah',
+            href: `/${props.auth.user.peran}/nasabah`,
         },
     ],
 });

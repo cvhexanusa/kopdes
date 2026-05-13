@@ -12,7 +12,7 @@ class InstansiController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, $peran)
     {
         $user = auth()->user();
         $query = Instansi::query();
@@ -43,7 +43,7 @@ class InstansiController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $peran)
     {
         if (auth()->user()->peran !== 'administrator') {
             Log::warning('Unauthorized instansi creation attempt', ['user' => auth()->id(), 'role' => auth()->user()->peran]);
@@ -97,11 +97,11 @@ class InstansiController extends Controller
 
         // Security check for Pengawas
         if ($user->peran === 'pengawas') {
-            if (trim((string)$id) !== trim((string)$user->instansi_id)) {
+            if (trim((string)$instansi) !== trim((string)$user->instansi_id)) {
                 Log::warning('Unauthorized Instansi access by Pengawas', [
                     'user_id' => $user->users_id,
                     'user_instansi' => $user->instansi_id,
-                    'requested_id' => $id
+                    'requested_id' => $instansi
                 ]);
                 abort(403, 'Anda hanya dapat mengakses profil instansi Anda sendiri.');
             }
@@ -121,7 +121,7 @@ class InstansiController extends Controller
         $user = auth()->user();
 
         // Security check
-        if ($user->peran === 'pengawas' && trim((string)$id) !== trim((string)$user->instansi_id)) {
+        if ($user->peran === 'pengawas' && trim((string)$instansi) !== trim((string)$user->instansi_id)) {
             abort(403);
         }
 

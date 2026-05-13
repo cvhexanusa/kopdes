@@ -354,7 +354,7 @@ InstansiIndex.layout = (props: any) => ({
     breadcrumbs: [
         {
             title: 'Instansi',
-            href: `/instansi`,
+            href: `/${props.auth.user.peran}/instansi`,
         },
     ],
 });

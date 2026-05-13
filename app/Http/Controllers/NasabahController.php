@@ -16,7 +16,7 @@ class NasabahController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, $peran)
     {
         $user = auth()->user();
         $query = Nasabah::with('instansi');
@@ -49,6 +49,7 @@ class NasabahController extends Controller
             'filters' => $request->only(['search']),
         ]);
     }
+
 
     /**
      * Display the specified resource.
