@@ -64,14 +64,14 @@
 
         .checkbox {
             display: inline-block;
-            width: 11pt;
-            height: 11pt;
+            width: 9pt;
+            height: 9pt;
             border: 1px solid #000;
             margin-right: 5pt;
             vertical-align: middle;
             text-align: center;
-            line-height: 11pt;
-            font-size: 10pt;
+            line-height: 7pt; /* Lower line height to pull the large checkmark up/center */
+            font-size: 13pt;
             font-weight: bold;
         }
 
