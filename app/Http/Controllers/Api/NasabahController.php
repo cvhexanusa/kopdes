@@ -34,6 +34,16 @@ class NasabahController extends Controller
             }
         }
 
+        // Normalisasi Jenis Kelamin (agar Laki-Laki, Laki-laki, laki-laki semua diterima)
+        if (isset($data['jenis_kelamin'])) {
+            $jk = strtolower($data['jenis_kelamin']);
+            if (str_contains($jk, 'laki')) {
+                $data['jenis_kelamin'] = 'Laki-laki';
+            } elseif (str_contains($jk, 'perempuan') || str_contains($jk, 'wanita')) {
+                $data['jenis_kelamin'] = 'Perempuan';
+            }
+        }
+
         $validator = Validator::make($data, [
             'nama' => 'required|string|max:255',
             'nik' => 'required|string|unique:nasabahs,nik',
@@ -47,7 +57,10 @@ class NasabahController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::warning('Validation failed for Nasabah API', ['errors' => $validator->errors()->toArray(), 'received' => array_keys($data)]);
+            Log::warning('Validation failed for Nasabah API', [
+                'errors' => $validator->errors()->toArray(), 
+                'received_values' => $data // Log nilai yang diterima untuk debug
+            ]);
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
