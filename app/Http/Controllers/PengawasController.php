@@ -14,7 +14,7 @@ class PengawasController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, $peran)
     {
         $query = User::where('peran', 'pengawas')->with('instansi');
 
@@ -39,7 +39,7 @@ class PengawasController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $peran)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -67,7 +67,7 @@ class PengawasController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $peran, $id)
     {
         $pengawa = User::findOrFail($id);
         
@@ -94,7 +94,7 @@ class PengawasController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy($peran, $id)
     {
         $pengawa = User::findOrFail($id);
         $pengawa->delete();

@@ -12,7 +12,7 @@ class InstansiController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, $peran)
     {
         $user = auth()->user();
         $query = Instansi::query();
@@ -43,9 +43,10 @@ class InstansiController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $peran)
     {
         if (auth()->user()->peran !== 'administrator') {
+            Log::warning('Unauthorized instansi creation attempt', ['user' => auth()->id(), 'role' => auth()->user()->peran]);
             abort(403);
         }
 
@@ -58,28 +59,38 @@ class InstansiController extends Controller
             'waktu_aktif' => 'nullable|date',
         ]);
 
-        Instansi::create([
-            'nama' => $request->nama,
-            'desa' => $request->desa,
-            'kecamatan' => $request->kecamatan,
-            'kabupaten' => $request->kabupaten,
-            'kode_pos' => $request->kode_pos,
-            'waktu_aktif' => $request->waktu_aktif,
-            'users_id' => $request->user()->users_id,
-        ]);
+        try {
+            Instansi::create([
+                'nama' => $request->nama,
+                'desa' => $request->desa,
+                'kecamatan' => $request->kecamatan,
+                'kabupaten' => $request->kabupaten,
+                'kode_pos' => $request->kode_pos,
+                'waktu_aktif' => $request->waktu_aktif,
+                'users_id' => $request->user()->users_id,
+            ]);
 
-        Inertia::flash('toast', [
-            'type' => 'success',
-            'message' => 'Instansi berhasil ditambahkan'
-        ]);
+            Inertia::flash('toast', [
+                'type' => 'success',
+                'message' => 'Instansi berhasil ditambahkan'
+            ]);
 
-        return redirect()->back();
+            return redirect()->back();
+        } catch (\Exception $e) {
+            Log::error('Gagal menambah instansi: ' . $e->getMessage(), [
+                'user_id' => auth()->id(),
+                'users_id' => auth()->user()->users_id,
+                'request' => $request->all()
+            ]);
+            
+            return redirect()->back()->withErrors(['message' => 'Gagal menambah data: ' . $e->getMessage()]);
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($peran, $id)
     {
         $instansi = Instansi::findOrFail($id);
         $user = auth()->user();
@@ -104,7 +115,7 @@ class InstansiController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $peran, $id)
     {
         $instansi = Instansi::findOrFail($id);
         $user = auth()->user();
@@ -136,7 +147,7 @@ class InstansiController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy($peran, $id)
     {
         if (auth()->user()->peran !== 'administrator') {
             abort(403);

@@ -15,7 +15,7 @@ class NasabahController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, $peran)
     {
         $user = auth()->user();
         $query = Nasabah::with('instansi');
@@ -52,7 +52,7 @@ class NasabahController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($peran, $id)
     {
         $nasabah = Nasabah::with('instansi')->findOrFail($id);
         $user = auth()->user();
@@ -77,7 +77,7 @@ class NasabahController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $peran, $id)
     {
         $nasabah = Nasabah::findOrFail($id);
         $user = auth()->user();
@@ -112,7 +112,7 @@ class NasabahController extends Controller
     /**
      * Export nasabah data to PDF.
      */
-    public function pdf($id)
+    public function pdf($peran, $id)
     {
         $nasabah = Nasabah::with('instansi')->findOrFail($id);
         $user = auth()->user();
@@ -131,7 +131,7 @@ class NasabahController extends Controller
     /**
      * Export selected nasabah to Google Drive organized by instansi.
      */
-    public function exportToDrive(Request $request, GoogleDriveService $driveService)
+    public function exportToDrive(Request $request, $peran, GoogleDriveService $driveService)
     {
         $request->validate([
             'ids' => 'required|array',
@@ -158,7 +158,7 @@ class NasabahController extends Controller
     /**
      * Handle the callback from Google OAuth.
      */
-    public function googleCallback(Request $request, GoogleDriveService $driveService)
+    public function googleCallback(Request $request, $peran, GoogleDriveService $driveService)
     {
         if ($request->has('code')) {
             $token = $driveService->authenticate($request->code);
@@ -206,7 +206,7 @@ class NasabahController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy($peran, $id)
     {
         $nasabah = Nasabah::findOrFail($id);
         $user = auth()->user();
