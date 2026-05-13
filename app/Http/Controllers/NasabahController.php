@@ -168,14 +168,21 @@ class NasabahController extends Controller
 
         $token = session('google_drive_token');
 
-        if (!$token) {
+        if (!$token || !isset($token['access_token'])) {
+            session()->forget('google_drive_token');
             session(['nasabah_export_ids' => $ids]);
             return redirect()->away($driveService->getAuthUrl());
         }
 
-        $driveService->setAccessToken($token);
+        try {
+            $driveService->setAccessToken($token);
 
-        if ($driveService->isAccessTokenExpired()) {
+            if ($driveService->isAccessTokenExpired()) {
+                session(['nasabah_export_ids' => $ids]);
+                return redirect()->away($driveService->getAuthUrl());
+            }
+        } catch (\Exception $e) {
+            session()->forget('google_drive_token');
             session(['nasabah_export_ids' => $ids]);
             return redirect()->away($driveService->getAuthUrl());
         }
@@ -189,21 +196,24 @@ class NasabahController extends Controller
     public function googleCallback(Request $request, GoogleDriveService $driveService)
     {
         if ($request->has('code')) {
-            $token = $driveService->authenticate($request->code);
-            session(['google_drive_token' => $token]);
-            
-            $ids = session('nasabah_export_ids');
-            if ($ids) {
-                $driveService->setAccessToken($token);
-                $this->processExport($ids, $driveService);
-                session()->forget('nasabah_export_ids');
+            try {
+                $token = $driveService->authenticate($request->code);
                 
-                return "<html><body style='font-family:sans-serif; text-align:center; padding-top:50px;'>
-                    <h2 style='color:green;'>Export Berhasil!</h2>
-                    <p>Data nasabah telah berhasil diexport ke Google Drive.</p>
-                    <p>Anda dapat menutup tab ini sekarang.</p>
-                    <button onclick='window.close()' style='padding:10px 20px; cursor:pointer;'>Tutup Tab</button>
-                </body></html>";
+                if (isset($token['error'])) {
+                    return "Gagal autentikasi Google: " . ($token['error_description'] ?? $token['error']);
+                }
+
+                session(['google_drive_token' => $token]);
+                
+                $ids = session('nasabah_export_ids');
+                if ($ids) {
+                    $driveService->setAccessToken($token);
+                    $result = $this->processExport($ids, $driveService);
+                    session()->forget('nasabah_export_ids');
+                    return $result;
+                }
+            } catch (\Exception $e) {
+                return "Error saat autentikasi: " . $e->getMessage();
             }
         }
 
