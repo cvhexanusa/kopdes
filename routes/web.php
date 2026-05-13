@@ -6,6 +6,7 @@ use App\Http\Controllers\InstansiController;
 use App\Http\Controllers\NasabahController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
+use Inertia\Inertia;
 
 Route::inertia('/', 'welcome', [
     'canRegister' => Features::enabled(Features::registration()),
