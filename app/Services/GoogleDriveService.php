@@ -13,9 +13,9 @@ class GoogleDriveService
     public function __construct()
     {
         $this->client = new Client();
-        $this->client->setClientId(env('GOOGLE_CLIENT_ID'));
-        $this->client->setClientSecret(env('GOOGLE_CLIENT_SECRET'));
-        $this->client->setRedirectUri(env('GOOGLE_REDIRECT_URI', route('nasabah.export-drive.callback')));
+        $this->client->setClientId(config('google.client_id'));
+        $this->client->setClientSecret(config('google.client_secret'));
+        $this->client->setRedirectUri(config('google.redirect_uri') ?: route('nasabah.export-drive.callback'));
         $this->client->addScope(Drive::DRIVE);
         $this->client->setAccessType('offline');
         $this->client->setPrompt('select_account consent');

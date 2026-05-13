@@ -90,7 +90,7 @@ class InstansiController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($peran, $id)
     {
         $instansi = Instansi::findOrFail($id);
         $user = auth()->user();
@@ -115,7 +115,7 @@ class InstansiController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $peran, $id)
     {
         $instansi = Instansi::findOrFail($id);
         $user = auth()->user();
@@ -147,7 +147,7 @@ class InstansiController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy($peran, $id)
     {
         if (auth()->user()->peran !== 'administrator') {
             abort(403);

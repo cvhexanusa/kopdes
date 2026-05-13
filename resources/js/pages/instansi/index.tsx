@@ -107,7 +107,7 @@ export default function InstansiIndex({ instansis, filters }: Props) {
     const onEditSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!editingInstansi) return;
-        editForm.put(instansiRoutes.update.url(editingInstansi.instansi_id), {
+        editForm.put(instansiRoutes.update.url({ instansi: editingInstansi.instansi_id }), {
             onSuccess: () => {
                 setIsEditOpen(false);
                 editForm.reset();
@@ -118,7 +118,7 @@ export default function InstansiIndex({ instansis, filters }: Props) {
 
     const onDeleteSubmit = () => {
         if (!deletingInstansiId) return;
-        router.delete(instansiRoutes.destroy.url(deletingInstansiId), {
+        router.delete(instansiRoutes.destroy.url({ instansi: deletingInstansiId }), {
             onSuccess: () => {
                 setIsDeleteOpen(false);
                 setDeletingInstansiId(null);

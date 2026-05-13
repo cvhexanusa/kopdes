@@ -63,6 +63,60 @@ export default function AddressSelector({ onSelect, initialValues }: AddressSele
             .then(data => setProvinces(sortByName(data)));
     }, []);
 
+    useEffect(() => {
+        if (!initialValues || provinces.length === 0) return;
+
+        // Find province by name
+        // We handle cases where only kabupaten/kecamatan/desa are provided (like in Instansi)
+        // by defaulting province to West Java (Jawa Barat) if missing, since this app is for KopDes
+        const targetProvince = initialValues.province || 'JAWA BARAT';
+        const province = provinces.find(p => p.name.toUpperCase() === targetProvince.toUpperCase());
+        
+        if (province && !selectedProvince) {
+            setSelectedProvince(province.id);
+            
+            fetch(`${API_BASE}/regencies/${province.id}.json`)
+                .then(res => res.json())
+                .then(regencyData => {
+                    const sortedRegencies = sortByName(regencyData);
+                    setRegencies(sortedRegencies);
+                    
+                    const regency = sortedRegencies.find(r => 
+                        formatLocationName(r.name).toUpperCase() === initialValues.kabupaten?.toUpperCase() ||
+                        r.name.toUpperCase() === initialValues.kabupaten?.toUpperCase()
+                    );
+                    
+                    if (regency) {
+                        setSelectedRegency(regency.id);
+                        
+                        fetch(`${API_BASE}/districts/${regency.id}.json`)
+                            .then(res => res.json())
+                            .then(districtData => {
+                                const sortedDistricts = sortByName(districtData);
+                                setDistricts(sortedDistricts);
+                                
+                                const district = sortedDistricts.find(d => d.name.toUpperCase() === initialValues.kecamatan?.toUpperCase());
+                                if (district) {
+                                    setSelectedDistrict(district.id);
+                                    
+                                    fetch(`${API_BASE}/villages/${district.id}.json`)
+                                        .then(res => res.json())
+                                        .then(villageData => {
+                                            const sortedVillages = sortByName(villageData);
+                                            setVillages(sortedVillages);
+                                            
+                                            const village = sortedVillages.find(v => v.name.toUpperCase() === initialValues.desa?.toUpperCase());
+                                            if (village) {
+                                                setSelectedVillage(village.id);
+                                            }
+                                        });
+                                }
+                            });
+                    }
+                });
+        }
+    }, [provinces, initialValues]);
+
     const handleProvinceChange = (id: string) => {
         setSelectedProvince(id);
         setSelectedRegency('');

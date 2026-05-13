@@ -92,7 +92,7 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
     const onEditSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedNasabah) return;
-        editForm.put(nasabahRoutes.update.url(selectedNasabah.nasabah_id), {
+        editForm.put(nasabahRoutes.update.url({ nasabah: selectedNasabah.nasabah_id }), {
             onSuccess: () => {
                 setIsEditOpen(false);
                 editForm.reset();
@@ -103,7 +103,7 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
 
     const onDeleteSubmit = () => {
         if (!deletingNasabahId) return;
-        router.delete(nasabahRoutes.destroy.url(deletingNasabahId), {
+        router.delete(nasabahRoutes.destroy.url({ nasabah: deletingNasabahId }), {
             onSuccess: () => {
                 setIsDeleteOpen(false);
                 setDeletingNasabahId(null);
@@ -212,7 +212,7 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                                                     size="icon"
                                                     asChild
                                                 >
-                                                    <Link href={`${rolePrefix}/nasabah/${n.nasabah_id}`} title="Lihat Detail">
+                                                    <Link href={nasabahRoutes.show.url({ nasabah: n.nasabah_id })} title="Lihat Detail">
                                                         <Eye className="h-4 w-4" />
                                                     </Link>
                                                 </Button>
@@ -221,7 +221,7 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                                                     size="icon"
                                                     asChild
                                                 >
-                                                    <a href={`${rolePrefix}/nasabah/${n.nasabah_id}/pdf`} target="_blank" title="Cetak PDF">
+                                                    <a href={nasabahRoutes.pdf.url({ nasabah: n.nasabah_id })} target="_blank" title="Cetak PDF">
                                                         <Printer className="h-4 w-4" />
                                                     </a>
                                                 </Button>

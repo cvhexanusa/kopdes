@@ -94,7 +94,7 @@ export default function PengawasIndex({ pengawas, instansis, filters }: Props) {
     const onEditSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!editingPengawas) return;
-        editForm.put(pengawasRoutes.update.url(editingPengawas.id), {
+        editForm.put(pengawasRoutes.update.url({ pengawas: editingPengawas.id }), {
             onSuccess: () => {
                 setIsEditOpen(false);
                 editForm.reset();
@@ -105,7 +105,7 @@ export default function PengawasIndex({ pengawas, instansis, filters }: Props) {
 
     const onDeleteSubmit = () => {
         if (!deletingPengawasId) return;
-        router.delete(pengawasRoutes.destroy.url(deletingPengawasId), {
+        router.delete(pengawasRoutes.destroy.url({ pengawas: deletingPengawasId }), {
             onSuccess: () => {
                 setIsDeleteOpen(false);
                 setDeletingPengawasId(null);
