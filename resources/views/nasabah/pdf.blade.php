@@ -137,6 +137,9 @@
             <td class="label-col">Nama Lengkap</td>
             <td>{{ $nasabah->nama }}</td>
         </tr>
+    </table>
+
+    <table class="form-table">
         <tr>
             <td class="label-col">Jenis Kelamin</td>
             <td>
@@ -145,7 +148,6 @@
             </td>
         </tr>
     </table>
-
     <table class="form-table">
         <tr>
             <td class="label-col">No. Identitas (Sesuai KTP)</td>
@@ -233,17 +235,16 @@
     <table class="signature-section">
         <tr>
             <td class="signature-box">
-                <p>Mengetahui/menyetujui,</p>
-                <p style="margin-top: 8pt;">2026</p>
+                <p>Mengetahui/menyetujui, 2026</p>
                 <p>Pengurus KDMP Sukamulya</p>
-                <div class="sig-spacer"></div>
-                <div class="sig-line"></div>
+                <div class="sig-spacer" style="height: 45pt;"></div>
+                <div class="sig-line" style="font-weight: bold;">&nbsp;</div>
                 <p style="font-size: 8.5pt;">Nama Jelas dan stempel</p>
             </td>
             <td class="signature-box">
                 <p>Sukamulya, ............................................ 2026</p>
-                <p style="margin-top: 20pt;">Pemohon</p>
-                <div class="sig-spacer" style="height: 38pt;"></div>
+                <p>Pemohon</p>
+                <div class="sig-spacer" style="height: 45pt;"></div>
                 <div class="sig-line" style="font-weight: bold;">{{ $nasabah->nama }}</div>
                 <p style="font-size: 8.5pt;">Nama Jelas dan Tanda Tangan</p>
             </td>

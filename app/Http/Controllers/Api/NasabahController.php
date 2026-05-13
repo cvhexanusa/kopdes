@@ -29,7 +29,7 @@ class NasabahController extends Controller
         // Bersihkan data teks
         $data = $request->all();
         foreach ($data as $key => $value) {
-            if (is_string($value) && !Str::startsWith($value, 'data:image')) {
+            if (is_string($value) && !Str::startsWith($value, 'data:')) {
                 $data[$key] = trim($value);
             }
         }
@@ -40,26 +40,30 @@ class NasabahController extends Controller
             'domisili' => 'required|string',
             'tempat_lahir' => 'required|string',
             'tanggal_lahir' => 'required|date',
+            'jenis_kelamin' => 'required|string|in:Laki-laki,Perempuan',
             'no_handphone' => 'required|string',
             'pekerjaan' => 'required|string',
             'instansi_id' => 'required|exists:instansis,instansi_id',
         ]);
 
         if ($validator->fails()) {
+            Log::warning('Validation failed for Nasabah API', ['errors' => $validator->errors()->toArray(), 'received' => array_keys($data)]);
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
         // Handle File Upload dari Google Apps Script (Base64)
         if ($request->has('foto_ktp_base64')) {
+            Log::info('Processing foto_ktp_base64');
             $data['foto_ktp'] = $this->uploadBase64($request->foto_ktp_base64, 'ktp');
         }
         if ($request->has('foto_kk_base64')) {
+            Log::info('Processing foto_kk_base64');
             $data['foto_kk'] = $this->uploadBase64($request->foto_kk_base64, 'kk');
         }
 
         try {
             $nasabah = Nasabah::create($data);
-            Log::info('Nasabah Created with Files: ' . $nasabah->nasabah_id);
+            Log::info('Nasabah Created Successfully: ' . $nasabah->nasabah_id . ' | Foto KTP: ' . ($nasabah->foto_ktp ?? 'null') . ' | Foto KK: ' . ($nasabah->foto_kk ?? 'null'));
             return response()->json([
                 'message' => 'Nasabah created successfully',
                 'data' => $nasabah
@@ -76,20 +80,39 @@ class NasabahController extends Controller
     private function uploadBase64($base64Data, $prefix)
     {
         try {
-            if (empty($base64Data)) return null;
+            if (empty($base64Data)) {
+                Log::warning("Base64 upload failed: data is empty for $prefix");
+                return null;
+            }
             
             // Format: data:image/jpeg;base64,xxxx
-            $image_service_str = explode(',', $base64Data);
-            if (count($image_service_str) < 2) return null;
+            if (Str::startsWith($base64Data, 'data:')) {
+                $image_service_str = explode(',', $base64Data);
+                if (count($image_service_str) < 2) {
+                    Log::warning("Base64 upload failed: comma separator not found for $prefix");
+                    return null;
+                }
+                $base64String = $image_service_str[1];
+            } else {
+                // If direct base64 string without data: prefix
+                $base64String = $base64Data;
+            }
             
-            $image = base64_decode($image_service_str[1]);
+            $image = base64_decode($base64String);
+            if (!$image) {
+                Log::warning("Base64 upload failed: base64_decode failed for $prefix");
+                return null;
+            }
+
             $filename = $prefix . '_' . time() . '_' . Str::random(10) . '.jpg';
             
-            Storage::disk('public')->put('nasabah/' . $filename, $image);
+            $path = 'nasabah/' . $filename;
+            Storage::disk('public')->put($path, $image);
             
-            return 'nasabah/' . $filename;
+            Log::info("Base64 upload success: $path saved");
+            return $path;
         } catch (\Exception $e) {
-            Log::error('Base64 Upload Error: ' . $e->getMessage());
+            Log::error('Base64 Upload Exception: ' . $e->getMessage());
             return null;
         }
     }

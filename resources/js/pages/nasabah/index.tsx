@@ -37,6 +37,7 @@ interface Nasabah {
     domisili: string;
     tempat_lahir: string;
     tanggal_lahir: string;
+    jenis_kelamin: string;
     no_handphone: string;
     pekerjaan: string;
     foto_ktp: string | null;
@@ -73,6 +74,7 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
         domisili: '',
         tempat_lahir: '',
         tanggal_lahir: '',
+        jenis_kelamin: '',
         no_handphone: '',
         pekerjaan: '',
         instansi_id: '',
@@ -248,6 +250,7 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                                                             domisili: n.domisili,
                                                             tempat_lahir: n.tempat_lahir,
                                                             tanggal_lahir: n.tanggal_lahir,
+                                                            jenis_kelamin: n.jenis_kelamin,
                                                             no_handphone: n.no_handphone,
                                                             pekerjaan: n.pekerjaan,
                                                             instansi_id: n.instansi_id,
@@ -312,6 +315,21 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                                         onChange={(e) => editForm.setData('no_handphone', e.target.value)}
                                         required
                                     />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label>Jenis Kelamin</Label>
+                                    <Select 
+                                        value={editForm.data.jenis_kelamin} 
+                                        onValueChange={(value) => editForm.setData('jenis_kelamin', value)}
+                                    >
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Pilih Jenis Kelamin" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Laki-laki">Laki-laki</SelectItem>
+                                            <SelectItem value="Perempuan">Perempuan</SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                                 <div className="grid gap-2">
                                     <Label htmlFor="pekerjaan">Pekerjaan</Label>

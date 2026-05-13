@@ -17,6 +17,7 @@ interface Nasabah {
     domisili: string;
     tempat_lahir: string;
     tanggal_lahir: string;
+    jenis_kelamin: string;
     no_handphone: string;
     pekerjaan: string;
     foto_ktp: string | null;
@@ -108,6 +109,13 @@ export default function NasabahShow({ nasabah }: Props) {
                                         <span>Tempat, Tanggal Lahir</span>
                                     </div>
                                     <p className="text-base font-medium">{nasabah.tempat_lahir}, {nasabah.tanggal_lahir}</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <User className="h-4 w-4" />
+                                        <span>Jenis Kelamin</span>
+                                    </div>
+                                    <p className="text-base font-medium">{nasabah.jenis_kelamin}</p>
                                 </div>
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">

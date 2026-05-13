@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['nasabah_id', 'nama', 'nik', 'domisili', 'tempat_lahir', 'tanggal_lahir', 'no_handphone', 'pekerjaan', 'foto_ktp', 'foto_kk', 'instansi_id'])]
+#[Fillable(['nasabah_id', 'nama', 'nik', 'domisili', 'tempat_lahir', 'tanggal_lahir', 'jenis_kelamin', 'no_handphone', 'pekerjaan', 'foto_ktp', 'foto_kk', 'instansi_id'])]
 class Nasabah extends Model
 {
     use HasUuids;
@@ -31,6 +31,7 @@ class Nasabah extends Model
             'nik' => 'encrypted',
             'tempat_lahir' => 'encrypted',
             'tanggal_lahir' => 'encrypted',
+            'jenis_kelamin' => 'encrypted',
             'no_handphone' => 'encrypted',
             'foto_ktp' => 'encrypted',
             'foto_kk' => 'encrypted',

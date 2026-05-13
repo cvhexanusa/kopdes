@@ -93,6 +93,7 @@ class NasabahController extends Controller
             'domisili' => 'required|string',
             'tempat_lahir' => 'required|string',
             'tanggal_lahir' => 'required|date',
+            'jenis_kelamin' => 'required|string|in:Laki-laki,Perempuan',
             'no_handphone' => 'required|string',
             'pekerjaan' => 'required|string',
             'instansi_id' => 'required|exists:instansis,instansi_id',
