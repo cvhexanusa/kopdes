@@ -1,4 +1,4 @@
-import { Head, Link, usePage, useForm } from '@inertiajs/react';
+import { Head, Link, usePage, useForm, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +26,7 @@ interface Nasabah {
     instansi_id: string;
     instansi?: Instansi;
     created_at: string;
+    updated_at: string;
 }
 
 interface Props {
@@ -54,16 +55,27 @@ export default function NasabahShow({ nasabah }: Props) {
     });
 
     const handlePhotoUpdate = (type: 'ktp' | 'kk', file: File) => {
-        const formData = { ...data };
-        if (type === 'ktp') formData.foto_ktp = file;
-        if (type === 'kk') formData.foto_kk = file;
+        // Prepare current data plus the new file
+        const updateData = {
+            _method: 'PUT',
+            nama: nasabah.nama,
+            nik: nasabah.nik,
+            domisili: nasabah.domisili,
+            tempat_lahir: nasabah.tempat_lahir,
+            tanggal_lahir: nasabah.tanggal_lahir,
+            jenis_kelamin: nasabah.jenis_kelamin,
+            no_handphone: nasabah.no_handphone,
+            pekerjaan: nasabah.pekerjaan,
+            instansi_id: nasabah.instansi_id,
+            foto_ktp: type === 'ktp' ? file : null,
+            foto_kk: type === 'kk' ? file : null,
+        };
 
-        // Inertia doesn't support PUT with Files easily, so we use POST with _method: PUT
-        post(`${rolePrefix}/nasabah/${nasabah.nasabah_id}`, {
+        router.post(`${rolePrefix}/nasabah/${nasabah.nasabah_id}`, updateData, {
+            forceFormData: true,
             onSuccess: () => {
                 // Berhasil
             },
-            forceFormData: true,
         });
     };
 
@@ -95,7 +107,7 @@ export default function NasabahShow({ nasabah }: Props) {
                         <h1 className="text-2xl font-bold">Profil Nasabah</h1>
                         <p className="text-muted-foreground">Detail informasi pendaftaran nasabah.</p>
                     </div>
-                    <Button asChild variant="default">
+                    <Button asChild variant="default" title="Cetak PDF Nasabah">
                         <a href={`${rolePrefix}/nasabah/${nasabah.nasabah_id}/pdf`} target="_blank">
                             <Printer className="h-4 w-4 mr-2" />
                             Cetak PDF
@@ -207,6 +219,7 @@ export default function NasabahShow({ nasabah }: Props) {
                                             className="h-8 w-8"
                                             onClick={() => ktpInputRef.current?.click()}
                                             disabled={processing}
+                                            title="Unggah/Ganti Foto KTP"
                                         >
                                             {processing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                                         </Button>
@@ -216,6 +229,7 @@ export default function NasabahShow({ nasabah }: Props) {
                                             className="h-8 w-8"
                                             onClick={() => downloadFile(nasabah.foto_ktp, `KTP_${nasabah.nama}.jpg`)}
                                             disabled={!nasabah.foto_ktp}
+                                            title="Download Foto KTP"
                                         >
                                             <Download className="h-4 w-4" />
                                         </Button>
@@ -258,6 +272,7 @@ export default function NasabahShow({ nasabah }: Props) {
                                             className="h-8 w-8"
                                             onClick={() => kkInputRef.current?.click()}
                                             disabled={processing}
+                                            title="Unggah/Ganti Foto KK"
                                         >
                                             {processing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                                         </Button>
@@ -267,6 +282,7 @@ export default function NasabahShow({ nasabah }: Props) {
                                             className="h-8 w-8"
                                             onClick={() => downloadFile(nasabah.foto_kk, `KK_${nasabah.nama}.jpg`)}
                                             disabled={!nasabah.foto_kk}
+                                            title="Download Foto KK"
                                         >
                                             <Download className="h-4 w-4" />
                                         </Button>

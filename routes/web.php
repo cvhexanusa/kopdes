@@ -4,13 +4,17 @@ use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Controllers\PengawasController;
 use App\Http\Controllers\InstansiController;
 use App\Http\Controllers\NasabahController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Inertia\Inertia;
 
-Route::inertia('/', 'welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
+Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect(auth()->user()->peran . '/dashboard');
+    }
+    return redirect()->route('login');
+})->name('home');
 
 Route::middleware(['auth'])->group(function () {
     // Redirect /dashboard to the role-prefixed version
@@ -22,9 +26,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('{peran}')->group(function () {
         
         // Dashboard
-        Route::get('dashboard', function () {
-            return Inertia::render('dashboard');
-        })->name('dashboard');
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Resources and Shared Routes
         Route::get('invitations/{invitation}/accept', [TeamInvitationController::class, 'accept'])->name('invitations.accept');

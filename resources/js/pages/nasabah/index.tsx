@@ -226,7 +226,7 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                                                     size="icon"
                                                     asChild
                                                 >
-                                                    <Link href={`${rolePrefix}/nasabah/${n.nasabah_id}`}>
+                                                    <Link href={`${rolePrefix}/nasabah/${n.nasabah_id}`} title="Lihat Detail">
                                                         <Eye className="h-4 w-4" />
                                                     </Link>
                                                 </Button>
@@ -235,7 +235,7 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                                                     size="icon"
                                                     asChild
                                                 >
-                                                    <a href={`${rolePrefix}/nasabah/${n.nasabah_id}/pdf`} target="_blank">
+                                                    <a href={`${rolePrefix}/nasabah/${n.nasabah_id}/pdf`} target="_blank" title="Cetak PDF">
                                                         <Printer className="h-4 w-4" />
                                                     </a>
                                                 </Button>
@@ -258,7 +258,7 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                                                         setIsEditOpen(true);
                                                     }}
                                                 >
-                                                    <Pencil className="h-4 w-4" />
+                                                    <Pencil className="h-4 w-4" title="Edit Data" />
                                                 </Button>
                                                 <Button
                                                     variant="destructive"
@@ -268,7 +268,7 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                                                         setIsDeleteOpen(true);
                                                     }}
                                                 >
-                                                    <Trash2 className="h-4 w-4" />
+                                                    <Trash2 className="h-4 w-4" title="Hapus Data" />
                                                 </Button>
                                             </div>
                                         </td>
