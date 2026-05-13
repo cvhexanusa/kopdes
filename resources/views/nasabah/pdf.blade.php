@@ -265,7 +265,7 @@
         <table class="signature-section">
             <tr>
                 <td class="signature-box">
-                    <p>Mengetahui/menyetujui, 2026</p>
+                    <p>Mengetahui/menyetujui,</p>
                     <p>Pengurus KDMP Sukamulya</p>
                     <div class="sig-spacer" style="height: 45pt;"></div>
                     <div class="sig-line" style="font-weight: bold;">&nbsp;</div>

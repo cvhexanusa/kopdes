@@ -11,36 +11,43 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     if (auth()->check()) {
-        return redirect(auth()->user()->peran . '/dashboard');
+        return redirect('/' . auth()->user()->peran . '/dashboard');
     }
     return redirect()->route('login');
 })->name('home');
 
-Route::middleware(['auth'])->group(function () {
-    // Google Drive Callback (outside prefix for consistent Redirect URI)
-    Route::get('nasabah/export-drive/callback', [NasabahController::class, 'googleCallback'])->name('nasabah.export-drive.callback');
+// Direct /dashboard to correct role path
+Route::get('/dashboard', function () {
+    if (auth()->check()) {
+        return redirect('/' . auth()->user()->peran . '/dashboard');
+    }
+    return redirect()->route('login');
+})->middleware(['auth']);
 
-    // Redirect /dashboard to the role-prefixed version
-    Route::get('dashboard', function () {
-        return redirect(auth()->user()->peran . '/dashboard');
-    });
+// Google Drive Callback (Must be outside prefix)
+Route::get('nasabah/export-drive/callback', [NasabahController::class, 'googleCallback'])
+    ->middleware(['auth'])
+    ->name('nasabah.export-drive.callback');
 
-    // Grouping all routes with {peran} prefix
-    Route::prefix('{peran}')->where(['peran' => 'administrator|pengawas'])->group(function () {
-        
-        // Dashboard
-        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+// Role-based routes
+Route::group([
+    'prefix' => '{peran}',
+    'middleware' => ['auth'],
+    'where' => ['peran' => 'administrator|pengawas']
+], function () {
+    
+    // Dashboard (for other roles or fallback)
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        // Resources and Shared Routes
-        Route::get('invitations/{invitation}/accept', [TeamInvitationController::class, 'accept'])->name('invitations.accept');
-        Route::resource('pengawas', PengawasController::class);
-        Route::resource('instansi', InstansiController::class);
-        
-        // Nasabah Routes
-        Route::get('nasabah/{nasabah}/pdf', [NasabahController::class, 'pdf'])->name('nasabah.pdf');
-        Route::get('nasabah/export-drive', [NasabahController::class, 'exportToDrive'])->name('nasabah.export-drive');
-        Route::resource('nasabah', NasabahController::class);
-    });
+    // Resources and Shared Routes
+    Route::get('invitations/{invitation}/accept', [TeamInvitationController::class, 'accept'])->name('invitations.accept');
+    Route::resource('pengawas', PengawasController::class);
+    Route::resource('instansi', InstansiController::class);
+    
+    // Nasabah Routes
+    Route::get('nasabah/{nasabah}/pdf', [NasabahController::class, 'pdf'])->name('nasabah.pdf');
+    Route::get('nasabah/export-drive', [NasabahController::class, 'exportToDrive'])->name('nasabah.export-drive');
+    Route::resource('nasabah', NasabahController::class);
 });
 
 require __DIR__.'/settings.php';

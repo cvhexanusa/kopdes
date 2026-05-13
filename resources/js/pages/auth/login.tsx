@@ -24,7 +24,7 @@ export default function Login({
 }: Props) {
     return (
         <>
-            <Head title="Log in" />
+            <Head title="KopDes Merah Putih" />
 
             <Form
                 {...store.form()}
@@ -116,6 +116,6 @@ export default function Login({
 }
 
 Login.layout = {
-    title: 'Log in to your account',
-    description: 'Enter your email and password below to log in',
+    title: 'KopDes Merah Putih',
+    description: 'Silakan masuk ke akun Anda untuk mengelola data koperasi.',
 };

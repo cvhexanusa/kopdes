@@ -24,9 +24,13 @@ class HandleRolePrefix
             URL::defaults(['peran' => $user->peran]);
 
             // Validate access
-            if ($user->peran !== $peranInUrl) {
-                // Redirect to the correct role path if they try to access another role's URL
-                $newUrl = str_replace("/{$peranInUrl}/", "/" . $user->peran . "/", $request->getRequestUri());
+            $correctPeran = trim(strtolower($user->peran));
+            $currentPeran = trim(strtolower($peranInUrl));
+
+            if ($correctPeran !== $currentPeran) {
+                // Redirect to the correct role path
+                $requestUri = $request->getRequestUri();
+                $newUrl = preg_replace("/^\/{$peranInUrl}/", "/{$correctPeran}", $requestUri);
                 return redirect($newUrl);
             }
 
