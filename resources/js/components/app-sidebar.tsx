@@ -17,9 +17,12 @@ import type { NavItem } from '@/types';
 
 export function AppSidebar() {
     const page = usePage();
-    const dashboardUrl = '/dashboard';
+    const user = (page.props as any).auth.user;
+    
+    // Dynamic role prefix
+    const rolePrefix = `/${user.peran}`;
+    const dashboardUrl = `${rolePrefix}/dashboard`;
 
-    const user = page.props.auth.user;
     const isPengawas = user.peran === 'pengawas';
 
     const mainNavItems: NavItem[] = [
@@ -35,17 +38,17 @@ export function AppSidebar() {
         mainNavItems.push(
             {
                 title: 'Instansi',
-                href: '/instansi',
+                href: `${rolePrefix}/instansi`,
                 icon: Building,
             },
             {
                 title: 'Pengawas',
-                href: '/pengawas',
+                href: `${rolePrefix}/pengawas`,
                 icon: Users,
             },
             {
                 title: 'Nasabah',
-                href: '/nasabah',
+                href: `${rolePrefix}/nasabah`,
                 icon: UserCheck,
             }
         );
@@ -54,12 +57,12 @@ export function AppSidebar() {
         mainNavItems.push(
             {
                 title: 'Profil Instansi',
-                href: user.instansi_id ? `/instansi/${user.instansi_id}` : '/instansi',
+                href: user.instansi_id ? `${rolePrefix}/instansi/${user.instansi_id}` : `${rolePrefix}/instansi`,
                 icon: Building,
             },
             {
                 title: 'Nasabah',
-                href: '/nasabah',
+                href: `${rolePrefix}/nasabah`,
                 icon: UserCheck,
             }
         );
