@@ -26,7 +26,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Grouping all routes with {peran} prefix
-    Route::prefix('{peran}')->where('peran', 'admin|pengawas')->group(function () {
+    Route::prefix('{peran}')->where(['peran' => 'administrator|pengawas'])->group(function () {
         
         // Dashboard
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');

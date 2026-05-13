@@ -20,7 +20,7 @@ class DashboardController extends Controller
             'total_pengawas' => 0,
         ];
 
-        if ($user->peran === 'admin') {
+        if ($user->peran === 'administrator') {
             $stats['total_nasabah'] = Nasabah::count();
             $stats['total_instansi'] = Instansi::count();
             $stats['total_pengawas'] = User::where('peran', 'pengawas')->count();
