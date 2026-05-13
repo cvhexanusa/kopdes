@@ -97,9 +97,30 @@ class NasabahController extends Controller
             'no_handphone' => 'required|string',
             'pekerjaan' => 'required|string',
             'instansi_id' => 'required|exists:instansis,instansi_id',
+            'foto_ktp' => 'nullable|image|max:2048',
+            'foto_kk' => 'nullable|image|max:2048',
         ]);
 
-        $nasabah->update($request->all());
+        $data = $request->except(['foto_ktp', 'foto_kk']);
+
+        // Handle File Uploads
+        if ($request->hasFile('foto_ktp')) {
+            // Hapus file lama jika ada
+            if ($nasabah->foto_ktp && Storage::disk('public')->exists($nasabah->foto_ktp)) {
+                Storage::disk('public')->delete($nasabah->foto_ktp);
+            }
+            $data['foto_ktp'] = $request->file('foto_ktp')->store('nasabah', 'public');
+        }
+
+        if ($request->hasFile('foto_kk')) {
+            // Hapus file lama jika ada
+            if ($nasabah->foto_kk && Storage::disk('public')->exists($nasabah->foto_kk)) {
+                Storage::disk('public')->delete($nasabah->foto_kk);
+            }
+            $data['foto_kk'] = $request->file('foto_kk')->store('nasabah', 'public');
+        }
+
+        $nasabah->update($data);
 
         Inertia::flash('toast', [
             'type' => 'success',

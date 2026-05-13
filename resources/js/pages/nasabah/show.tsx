@@ -1,9 +1,10 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, useForm } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, User, CreditCard, Home, MapPin, Calendar, Phone, Briefcase, Building, Printer } from 'lucide-react';
+import { ArrowLeft, User, CreditCard, Home, MapPin, Calendar, Phone, Briefcase, Building, Printer, Download, Upload, Loader2 } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
+import { useRef } from 'react';
 
 interface Instansi {
     instansi_id: string;
@@ -34,6 +35,51 @@ interface Props {
 export default function NasabahShow({ nasabah }: Props) {
     const page = usePage();
     const rolePrefix = `/${(page.props as any).auth.user.peran}`;
+    const ktpInputRef = useRef<HTMLInputElement>(null);
+    const kkInputRef = useRef<HTMLInputElement>(null);
+
+    const { data, setData, post, processing } = useForm({
+        _method: 'PUT',
+        nama: nasabah.nama,
+        nik: nasabah.nik,
+        domisili: nasabah.domisili,
+        tempat_lahir: nasabah.tempat_lahir,
+        tanggal_lahir: nasabah.tanggal_lahir,
+        jenis_kelamin: nasabah.jenis_kelamin,
+        no_handphone: nasabah.no_handphone,
+        pekerjaan: nasabah.pekerjaan,
+        instansi_id: nasabah.instansi_id,
+        foto_ktp: null as File | null,
+        foto_kk: null as File | null,
+    });
+
+    const handlePhotoUpdate = (type: 'ktp' | 'kk', file: File) => {
+        const formData = { ...data };
+        if (type === 'ktp') formData.foto_ktp = file;
+        if (type === 'kk') formData.foto_kk = file;
+
+        // Inertia doesn't support PUT with Files easily, so we use POST with _method: PUT
+        post(`${rolePrefix}/nasabah/${nasabah.nasabah_id}`, {
+            onSuccess: () => {
+                // Berhasil
+            },
+            forceFormData: true,
+        });
+    };
+
+    const downloadFile = (path: string | null, filename: string) => {
+        if (!path) return;
+        const url = path.startsWith('nasabah/') 
+            ? `/storage/${path}` 
+            : `https://drive.google.com/uc?id=${path}`;
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    };
 
     return (
         <>
@@ -143,9 +189,37 @@ export default function NasabahShow({ nasabah }: Props) {
 
                         {/* Bagian Foto */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            {/* Card KTP */}
                             <Card>
-                                <CardHeader>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                     <CardTitle className="text-lg">Foto KTP</CardTitle>
+                                    <div className="flex gap-2">
+                                        <input 
+                                            type="file" 
+                                            ref={ktpInputRef} 
+                                            className="hidden" 
+                                            accept="image/*"
+                                            onChange={(e) => e.target.files?.[0] && handlePhotoUpdate('ktp', e.target.files[0])}
+                                        />
+                                        <Button 
+                                            variant="ghost" 
+                                            size="icon" 
+                                            className="h-8 w-8"
+                                            onClick={() => ktpInputRef.current?.click()}
+                                            disabled={processing}
+                                        >
+                                            {processing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                                        </Button>
+                                        <Button 
+                                            variant="ghost" 
+                                            size="icon" 
+                                            className="h-8 w-8"
+                                            onClick={() => downloadFile(nasabah.foto_ktp, `KTP_${nasabah.nama}.jpg`)}
+                                            disabled={!nasabah.foto_ktp}
+                                        >
+                                            <Download className="h-4 w-4" />
+                                        </Button>
+                                    </div>
                                 </CardHeader>
                                 <CardContent>
                                     {nasabah.foto_ktp ? (
@@ -157,20 +231,6 @@ export default function NasabahShow({ nasabah }: Props) {
                                                 alt="KTP" 
                                                 className="w-full h-full object-cover transition-transform group-hover:scale-105"
                                             />
-                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                <Button 
-                                                    variant="secondary" 
-                                                    size="sm" 
-                                                    onClick={() => window.open(
-                                                        nasabah.foto_ktp?.startsWith('nasabah/') 
-                                                        ? `/storage/${nasabah.foto_ktp}` 
-                                                        : `https://drive.google.com/uc?id=${nasabah.foto_ktp}`, 
-                                                        '_blank'
-                                                    )}
-                                                >
-                                                    Lihat Full HD
-                                                </Button>
-                                            </div>
                                         </div>
                                     ) : (
                                         <div className="aspect-video rounded-lg border border-dashed flex items-center justify-center text-muted-foreground italic text-sm">
@@ -180,9 +240,37 @@ export default function NasabahShow({ nasabah }: Props) {
                                 </CardContent>
                             </Card>
 
+                            {/* Card KK */}
                             <Card>
-                                <CardHeader>
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                     <CardTitle className="text-lg">Foto Kartu Keluarga</CardTitle>
+                                    <div className="flex gap-2">
+                                        <input 
+                                            type="file" 
+                                            ref={kkInputRef} 
+                                            className="hidden" 
+                                            accept="image/*"
+                                            onChange={(e) => e.target.files?.[0] && handlePhotoUpdate('kk', e.target.files[0])}
+                                        />
+                                        <Button 
+                                            variant="ghost" 
+                                            size="icon" 
+                                            className="h-8 w-8"
+                                            onClick={() => kkInputRef.current?.click()}
+                                            disabled={processing}
+                                        >
+                                            {processing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                                        </Button>
+                                        <Button 
+                                            variant="ghost" 
+                                            size="icon" 
+                                            className="h-8 w-8"
+                                            onClick={() => downloadFile(nasabah.foto_kk, `KK_${nasabah.nama}.jpg`)}
+                                            disabled={!nasabah.foto_kk}
+                                        >
+                                            <Download className="h-4 w-4" />
+                                        </Button>
+                                    </div>
                                 </CardHeader>
                                 <CardContent>
                                     {nasabah.foto_kk ? (
@@ -194,20 +282,6 @@ export default function NasabahShow({ nasabah }: Props) {
                                                 alt="KK" 
                                                 className="w-full h-full object-cover transition-transform group-hover:scale-105"
                                             />
-                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                <Button 
-                                                    variant="secondary" 
-                                                    size="sm" 
-                                                    onClick={() => window.open(
-                                                        nasabah.foto_kk?.startsWith('nasabah/') 
-                                                        ? `/storage/${nasabah.foto_kk}` 
-                                                        : `https://drive.google.com/uc?id=${nasabah.foto_kk}`, 
-                                                        '_blank'
-                                                    )}
-                                                >
-                                                    Lihat Full HD
-                                                </Button>
-                                            </div>
                                         </div>
                                     ) : (
                                         <div className="aspect-video rounded-lg border border-dashed flex items-center justify-center text-muted-foreground italic text-sm">

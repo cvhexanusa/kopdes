@@ -64,14 +64,15 @@
 
         .checkbox {
             display: inline-block;
-            width: 9pt;
-            height: 9pt;
+            width: 11pt;
+            height: 11pt;
             border: 1px solid #000;
             margin-right: 5pt;
             vertical-align: middle;
             text-align: center;
-            line-height: 9pt;
-            font-size: 7pt;
+            line-height: 11pt;
+            font-size: 10pt;
+            font-weight: bold;
         }
 
         .signature-section {
