@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -31,13 +31,16 @@ interface Props {
 }
 
 export default function NasabahShow({ nasabah }: Props) {
+    const page = usePage();
+    const rolePrefix = `/${(page.props as any).auth.user.peran}`;
+
     return (
         <>
             <Head title={`Detail ${nasabah.nama}`} />
             <div className="flex flex-col gap-6 p-6">
                 <div className="flex items-center gap-4">
                     <Button variant="outline" size="icon" asChild>
-                        <Link href="/nasabah">
+                        <Link href={`${rolePrefix}/nasabah`}>
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
                     </Button>
@@ -46,7 +49,7 @@ export default function NasabahShow({ nasabah }: Props) {
                         <p className="text-muted-foreground">Detail informasi pendaftaran nasabah.</p>
                     </div>
                     <Button asChild variant="default">
-                        <a href={`/nasabah/${nasabah.nasabah_id}/pdf`} target="_blank">
+                        <a href={`${rolePrefix}/nasabah/${nasabah.nasabah_id}/pdf`} target="_blank">
                             <Printer className="h-4 w-4 mr-2" />
                             Cetak PDF
                         </a>

@@ -1,4 +1,4 @@
-import { Head, useForm, router, Link } from '@inertiajs/react';
+import { Head, useForm, router, Link, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -64,6 +64,8 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [isExporting, setIsExporting] = useState(false);
+    const page = usePage();
+    const rolePrefix = `/${(page.props as any).auth.user.peran}`;
 
     const editForm = useForm({
         nama: '',
@@ -79,7 +81,7 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
     useEffect(() => {
         const timer = setTimeout(() => {
             if (search !== (filters.search || '')) {
-                router.get('/nasabah', { search }, { preserveState: true, replace: true });
+                router.get(`${rolePrefix}/nasabah`, { search }, { preserveState: true, replace: true });
             }
         }, 500);
         return () => clearTimeout(timer);
@@ -127,7 +129,7 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
         if (selectedIds.length === 0) return;
         
         setIsExporting(true);
-        router.post('/nasabah/export-drive', {
+        router.post(`${rolePrefix}/nasabah/export-drive`, {
             ids: selectedIds
         }, {
             onSuccess: () => {
@@ -222,7 +224,7 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                                                     size="icon"
                                                     asChild
                                                 >
-                                                    <Link href={`/nasabah/${n.nasabah_id}`}>
+                                                    <Link href={`${rolePrefix}/nasabah/${n.nasabah_id}`}>
                                                         <Eye className="h-4 w-4" />
                                                     </Link>
                                                 </Button>
@@ -231,7 +233,7 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                                                     size="icon"
                                                     asChild
                                                 >
-                                                    <a href={`/nasabah/${n.nasabah_id}/pdf`} target="_blank">
+                                                    <a href={`${rolePrefix}/nasabah/${n.nasabah_id}/pdf`} target="_blank">
                                                         <Printer className="h-4 w-4" />
                                                     </a>
                                                 </Button>

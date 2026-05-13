@@ -29,6 +29,9 @@ class HandleRolePrefix
                 $newUrl = str_replace("/{$peranInUrl}/", "/" . $user->peran . "/", $request->getRequestUri());
                 return redirect($newUrl);
             }
+
+            // Forget 'peran' so it doesn't get passed as an argument to controller methods
+            $request->route()->forgetParameter('peran');
         }
 
         return $next($request);

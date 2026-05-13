@@ -1,4 +1,4 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -30,10 +30,12 @@ export default function InstansiShow({ instansi }: Props) {
         kode_pos: instansi.kode_pos,
         waktu_aktif: instansi.waktu_aktif,
     });
+    const page = usePage();
+    const rolePrefix = `/${(page.props as any).auth.user.peran}`;
 
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/instansi/${instansi.instansi_id}`);
+        put(`${rolePrefix}/instansi/${instansi.instansi_id}`);
     };
 
     return (

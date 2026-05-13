@@ -1,5 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 import { BookOpen, FolderGit2, LayoutGrid, Users, Building, UserCheck } from 'lucide-react';
+import { addUrlDefault } from '@/wayfinder';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -18,6 +20,12 @@ import type { NavItem } from '@/types';
 export function AppSidebar() {
     const page = usePage();
     const user = (page.props as any).auth.user;
+
+    useEffect(() => {
+        if (user?.peran) {
+            addUrlDefault('peran', user.peran);
+        }
+    }, [user?.peran]);
     
     // Dynamic role prefix
     const rolePrefix = `/${user.peran}`;

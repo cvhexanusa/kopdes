@@ -1,4 +1,4 @@
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, useForm, router, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -56,6 +56,8 @@ export default function PengawasIndex({ pengawas, instansis, filters }: Props) {
     const [editingPengawas, setEditingPengawas] = useState<User | null>(null);
     const [deletingPengawasId, setDeletingPengawasId] = useState<number | null>(null);
     const [search, setSearch] = useState(filters.search || '');
+    const page = usePage();
+    const rolePrefix = `/${(page.props as any).auth.user.peran}`;
 
     const createForm = useForm({
         name: '',
@@ -73,7 +75,7 @@ export default function PengawasIndex({ pengawas, instansis, filters }: Props) {
     useEffect(() => {
         const timer = setTimeout(() => {
             if (search !== (filters.search || '')) {
-                router.get('/pengawas', { search }, { preserveState: true, replace: true });
+                router.get(`${rolePrefix}/pengawas`, { search }, { preserveState: true, replace: true });
             }
         }, 500);
         return () => clearTimeout(timer);
