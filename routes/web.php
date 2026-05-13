@@ -19,7 +19,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('invitations/{invitation}/accept', [TeamInvitationController::class, 'accept'])->name('invitations.accept');
     Route::resource('pengawas', PengawasController::class);
     Route::resource('instansi', InstansiController::class);
+    
+    // Nasabah Routes
     Route::get('nasabah/{nasabah}/pdf', [NasabahController::class, 'pdf'])->name('nasabah.pdf');
+    Route::post('nasabah/export-drive', [NasabahController::class, 'exportToDrive'])->name('nasabah.export-drive');
+    Route::get('nasabah/export-drive/callback', [NasabahController::class, 'googleCallback'])->name('nasabah.export-drive.callback');
     Route::resource('nasabah', NasabahController::class);
 });
 

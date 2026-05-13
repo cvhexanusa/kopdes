@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Nasabah;
 use App\Models\Instansi;
+use App\Services\GoogleDriveService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Log;
@@ -124,6 +125,81 @@ class NasabahController extends Controller
                   ->setPaper('a4', 'portrait');
 
         return $pdf->stream('Nasabah_' . $nasabah->nama . '.pdf');
+    }
+
+    /**
+     * Export selected nasabah to Google Drive organized by instansi.
+     */
+    public function exportToDrive(Request $request, GoogleDriveService $driveService)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:nasabahs,nasabah_id'
+        ]);
+
+        $token = session('google_drive_token');
+
+        if (!$token) {
+            session(['nasabah_export_ids' => $request->ids]);
+            return Inertia::location($driveService->getAuthUrl());
+        }
+
+        $driveService->setAccessToken($token);
+
+        if ($driveService->isAccessTokenExpired()) {
+            session(['nasabah_export_ids' => $request->ids]);
+            return Inertia::location($driveService->getAuthUrl());
+        }
+
+        return $this->processExport($request->ids, $driveService);
+    }
+
+    /**
+     * Handle the callback from Google OAuth.
+     */
+    public function googleCallback(Request $request, GoogleDriveService $driveService)
+    {
+        if ($request->has('code')) {
+            $token = $driveService->authenticate($request->code);
+            session(['google_drive_token' => $token]);
+            
+            $ids = session('nasabah_export_ids');
+            if ($ids) {
+                $driveService->setAccessToken($token);
+                $this->processExport($ids, $driveService);
+                session()->forget('nasabah_export_ids');
+                
+                Inertia::flash('toast', [
+                    'type' => 'success',
+                    'message' => 'Export ke Google Drive berhasil!'
+                ]);
+            }
+        }
+
+        return redirect()->route('nasabah.index');
+    }
+
+    /**
+     * Core logic to generate PDFs and upload to Drive.
+     */
+    protected function processExport($ids, $driveService)
+    {
+        $nasabahs = Nasabah::with('instansi')->whereIn('nasabah_id', $ids)->get();
+
+        foreach ($nasabahs as $nasabah) {
+            $instansiName = $nasabah->instansi->nama ?? 'Umum';
+            $folderId = $driveService->getOrCreateFolder($instansiName);
+            
+            $pdf = Pdf::loadView('nasabah.pdf', compact('nasabah'))
+                      ->setPaper('a4', 'portrait');
+            
+            $content = $pdf->output();
+            $fileName = 'Nasabah_' . str_replace(' ', '_', $nasabah->nama) . '.pdf';
+            
+            $driveService->uploadPdf($fileName, $content, $folderId);
+        }
+
+        return redirect()->route('nasabah.index');
     }
 
     /**

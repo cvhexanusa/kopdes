@@ -19,9 +19,11 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useState, useEffect } from 'react';
-import { Eye, Pencil, Trash2, Search, Printer } from 'lucide-react';
+import { Eye, Pencil, Trash2, Search, Printer, CloudDownload, Check } from 'lucide-react';
 import nasabahRoutes from '@/routes/nasabah';
 import Pagination from '@/components/pagination';
+import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from 'sonner';
 
 interface Instansi {
     instansi_id: string;
@@ -60,6 +62,8 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
     const [selectedNasabah, setSelectedNasabah] = useState<Nasabah | null>(null);
     const [deletingNasabahId, setDeletingNasabahId] = useState<string | null>(null);
     const [search, setSearch] = useState(filters.search || '');
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [isExporting, setIsExporting] = useState(false);
 
     const editForm = useForm({
         nama: '',
@@ -103,6 +107,44 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
         });
     };
 
+    const toggleSelectAll = () => {
+        if (selectedIds.length === nasabahs.data.length) {
+            setSelectedIds([]);
+        } else {
+            setSelectedIds(nasabahs.data.map(n => n.nasabah_id));
+        }
+    };
+
+    const toggleSelect = (id: string) => {
+        if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter(i => i !== id));
+        } else {
+            setSelectedIds([...selectedIds, id]);
+        }
+    };
+
+    const handleExportDrive = () => {
+        if (selectedIds.length === 0) return;
+        
+        setIsExporting(true);
+        router.post('/nasabah/export-drive', {
+            ids: selectedIds
+        }, {
+            onSuccess: () => {
+                toast.success('Export ke Google Drive berhasil!');
+                setSelectedIds([]);
+                setIsExporting(false);
+            },
+            onError: (errors: any) => {
+                toast.error(errors.message || 'Gagal export ke Google Drive');
+                setIsExporting(false);
+            },
+            onFinish: () => {
+                setIsExporting(false);
+            }
+        });
+    };
+
     return (
         <>
             <Head title="Data Nasabah" />
@@ -111,6 +153,16 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                     <div>
                         <h1 className="text-2xl font-bold">Data Nasabah</h1>
                         <p className="text-muted-foreground">Kelola data nasabah yang masuk melalui sistem.</p>
+                    </div>
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={handleExportDrive}
+                            disabled={selectedIds.length === 0 || isExporting}
+                        >
+                            <CloudDownload className={`mr-2 h-4 w-4 ${isExporting ? 'animate-bounce' : ''}`} />
+                            {isExporting ? 'Mengexport...' : `Export ke Drive (${selectedIds.length})`}
+                        </Button>
                     </div>
                 </div>
 
@@ -130,6 +182,12 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b bg-muted/50 transition-colors">
+                                <th className="h-12 w-12 px-4 align-middle">
+                                    <Checkbox 
+                                        checked={nasabahs.data.length > 0 && selectedIds.length === nasabahs.data.length}
+                                        onCheckedChange={toggleSelectAll}
+                                    />
+                                </th>
                                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Nama</th>
                                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">NIK</th>
                                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Pekerjaan</th>
@@ -140,13 +198,19 @@ export default function NasabahIndex({ nasabahs, instansis, filters }: Props) {
                         <tbody>
                             {nasabahs.data.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="h-24 text-center align-middle text-muted-foreground">
+                                    <td colSpan={6} className="h-24 text-center align-middle text-muted-foreground">
                                         Tidak ada data nasabah.
                                     </td>
                                 </tr>
                             ) : (
                                 nasabahs.data.map((n) => (
-                                    <tr key={n.nasabah_id} className="border-b transition-colors hover:bg-muted/50">
+                                    <tr key={n.nasabah_id} className={`border-b transition-colors hover:bg-muted/50 ${selectedIds.includes(n.nasabah_id) ? 'bg-muted' : ''}`}>
+                                        <td className="p-4 align-middle">
+                                            <Checkbox 
+                                                checked={selectedIds.includes(n.nasabah_id)}
+                                                onCheckedChange={() => toggleSelect(n.nasabah_id)}
+                                            />
+                                        </td>
                                         <td className="p-4 align-middle font-medium">{n.nama}</td>
                                         <td className="p-4 align-middle">{n.nik}</td>
                                         <td className="p-4 align-middle">{n.pekerjaan}</td>
