@@ -30,6 +30,20 @@ interface AddressSelectorProps {
 
 const API_BASE = 'https://www.emsifa.com/api-wilayah-indonesia/api';
 
+/**
+ * Clean up location names by removing prefixes like KABUPATEN or KOTA for display
+ */
+const formatLocationName = (name: string) => {
+    return name.replace(/^(KABUPATEN|KOTA)\s+/i, '').trim();
+};
+
+/**
+ * Sort items alphabetically by name
+ */
+const sortByName = (items: LocationItem[]) => {
+    return [...items].sort((a, b) => a.name.localeCompare(b.name));
+};
+
 export default function AddressSelector({ onSelect, initialValues }: AddressSelectorProps) {
     const [provinces, setProvinces] = useState<LocationItem[]>([]);
     const [regencies, setRegencies] = useState<LocationItem[]>([]);
@@ -46,7 +60,7 @@ export default function AddressSelector({ onSelect, initialValues }: AddressSele
     useEffect(() => {
         fetch(`${API_BASE}/provinces.json`)
             .then(res => res.json())
-            .then(setProvinces);
+            .then(data => setProvinces(sortByName(data)));
     }, []);
 
     const handleProvinceChange = (id: string) => {
@@ -62,7 +76,7 @@ export default function AddressSelector({ onSelect, initialValues }: AddressSele
         fetch(`${API_BASE}/regencies/${id}.json`)
             .then(res => res.json())
             .then(data => {
-                setRegencies(data);
+                setRegencies(sortByName(data));
                 setLoading(false);
             });
     };
@@ -78,7 +92,7 @@ export default function AddressSelector({ onSelect, initialValues }: AddressSele
         fetch(`${API_BASE}/districts/${id}.json`)
             .then(res => res.json())
             .then(data => {
-                setDistricts(data);
+                setDistricts(sortByName(data));
                 setLoading(false);
             });
     };
@@ -92,7 +106,7 @@ export default function AddressSelector({ onSelect, initialValues }: AddressSele
         fetch(`${API_BASE}/villages/${id}.json`)
             .then(res => res.json())
             .then(data => {
-                setVillages(data);
+                setVillages(sortByName(data));
                 setLoading(false);
             });
     };
@@ -141,7 +155,9 @@ export default function AddressSelector({ onSelect, initialValues }: AddressSele
                     </SelectTrigger>
                     <SelectContent>
                         {regencies.map(r => (
-                            <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
+                            <SelectItem key={r.id} value={r.id}>
+                                {formatLocationName(r.name)}
+                            </SelectItem>
                         ))}
                     </SelectContent>
                 </Select>
